@@ -1,17 +1,11 @@
-# ps2x2pico
-USB keyboard/mouse to PS/2 interface converter using a Raspberry Pi Pico
+# USB2PS2
+Convertidor de teclado USB a PS/2 con una placa RP2040 Zero.
+Este proyecto es un fork de https://github.com/No0ne/ps2x2pico
 
 
 |![hw1](https://raw.githubusercontent.com/No0ne/ps2x2pico/main/doc/hw1.jpg) |![hw2](https://raw.githubusercontent.com/No0ne/ps2x2pico/main/doc/hw2.jpg) |![hw3](https://raw.githubusercontent.com/No0ne/ps2x2pico/main/doc/hw3.jpg) |![hw4](https://raw.githubusercontent.com/No0ne/ps2x2pico/main/doc/hw4.jpg) |
 |-|-|-|-|
 
-Keyboard only (incl. PC-XT) variant: https://github.com/No0ne/ps2pico
-
-[PicoMiteVGA](https://geoffg.net/picomitevga.html) variant: https://github.com/No0ne/hid2cdc
-
-[PiKVM](https://pikvm.org) integration:
-* https://docs.pikvm.org/pico_hid/
-* https://docs.pikvm.org/pico_hid_bridge/
 
 # Usage
 * Download `ps2x2pico.uf2` from https://github.com/No0ne/ps2x2pico/releases
