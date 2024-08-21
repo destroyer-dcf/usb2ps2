@@ -1,4 +1,5 @@
 #!/bin/bash
+
 export PICO_SDK_PATH=~/pico-sdk
 echo "PICO_SDK_PATH ha sido configurado a $PICO_SDK_PATH"
 PROJECT_DIR="."
