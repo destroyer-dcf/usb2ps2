@@ -42,7 +42,7 @@ Este proyecto es un fork de https://github.com/No0ne/ps2x2pico pensado como adap
 | 6    | Sin Uso| Sin Uso |
 
 
-# Instalar el software
+# Instalar
 * Descargar  `usb2ps2.uf2` from https://github.com/destroyer-dcf/usb2ps2/releases/download/1.0
 * Copie `usb2ps2.uf2` a su RP2040 presionando BOOT antes de enchufarlo.
 * Conecta tu teclado al usbc de la placa
