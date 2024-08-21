@@ -3,10 +3,10 @@ Convertidor de teclado USB a PS/2 con una placa RP2040 Zero.
 Este proyecto es un fork de https://github.com/No0ne/ps2x2pico pensado como adaptacion para ESPectrum
 
 
-
-|![hw1](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/FOTO0.jpg) |![hw2](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/FOTO1.jpg) |![hw3](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/FOTO3.jpg) |![hw4](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/FOTO4.jpg) |
-|-|-|-|-|
-
+|![hw1](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/FOTO0.jpg) |![hw2](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/FOTO1.jpg) |
+|-|-|
+|![hw1](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/FOTO3.jpg) |![hw2](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/FOTO4.jpg) |
+|-|-|
 
 # Usage
 * Download `ps2x2pico.uf2` from https://github.com/No0ne/ps2x2pico/releases
