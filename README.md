@@ -12,7 +12,7 @@ Este proyecto es un fork de https://github.com/No0ne/ps2x2pico pensado como adap
 ![hw1](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/circuito.jpg) 
 [Descarga Esquema](docs/Schematic_USB2PS-2_2024-08-20.pdf)
 
-![hw1](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/circuito2.jpg) 
+![hw2](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/circuito2.jpg) 
 [Descarga Esquema](docs/Schematic_USB2PS-2_2024-08-20.pdf)
 
 # Usage
