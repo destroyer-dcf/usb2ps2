@@ -76,4 +76,4 @@ Si lo prefieres puedes ejecutar el script `compile.sh` cambiando la linea  `expo
 * https://github.com/No0ne/ps2x2pico
 
 # Agradecimientos
-Gracias a NoOne por su ayuda y compartir este trabajo.
+Gracias a NoOne por su ayuda y compartir su trabajo.
