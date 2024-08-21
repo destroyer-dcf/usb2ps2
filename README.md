@@ -8,6 +8,9 @@ Este proyecto es un fork de https://github.com/No0ne/ps2x2pico pensado como adap
 |![hw1](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/FOTO3.jpg) |![hw2](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/FOTO4.jpg) |
 |-|-|
 
+# Circuito
+![hw1](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/circuito.jpg) 
+
 # Usage
 * Download `ps2x2pico.uf2` from https://github.com/No0ne/ps2x2pico/releases
 * Copy `ps2x2pico.uf2` to your Pi Pico by pressing BOOTSEL before pluggging in.
