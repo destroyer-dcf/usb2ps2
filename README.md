@@ -70,6 +70,8 @@ cmake ..
 make
 ```
 
+Si lo prefieres puedes ejecutar el script `compile.sh` cambiando la linea  `export PICO_SDK_PATH=~/pico-sdk` por tu path de pico-sdk
+
 # Recursos
 * https://github.com/No0ne/ps2x2pico
 
