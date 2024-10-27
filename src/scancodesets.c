@@ -56,6 +56,21 @@ u8 const ext_code_modifier_keys_1_2[] = {
   0
 };
 
+
+// const int ESP_JOY1LEFT = 0x40;
+// const int ESP_JOY1RIGHT = 0x41;
+// const int ESP_JOY1UP = 0x42;
+// const int ESP_JOY1DOWN = 0x43;
+// const int ESP_JOY1START = 0x44;
+// const int ESP_JOY1MODE = 0x45;
+// const int ESP_JOY1A = 0x46;
+// const int ESP_JOY1B = 0x47;
+// const int ESP_JOY1C = 0x48;
+// const int ESP_JOY1X = 0x49;
+// const int ESP_JOY1Y = 0x4a;
+// const int ESP_JOY1Z = 0x4b;
+
+
 u8 const prt_scn_make_1[]  = { 0xe0, 0x2a, 0xe0, 0x37, 0 };
 u8 const prt_scn_break_1[] = { 0xe0, 0xb7, 0xe0, 0xaa, 0 };
 u8 const break_make_1[]    = { 0xe0, 0x46, 0xe0, 0xc6, 0 };
@@ -348,7 +363,19 @@ u8 const hid2ps2_2[] = {
   0x48, // F21
   0x50, // F22
   0x57, // F23
-  0x5f  // F24
+  0x5f,  // F24
+  // 0x40,  // LEFT
+  // 0x41,  // RIGHT
+  // 0x42,  // UP
+  // 0x43,  // DOWN
+  // 0x44,  // START
+  // 0x45,  // MODE
+  // 0x46,  // BUTTON_A
+  // 0x47,  // BUTTON_B
+  // 0x48,  // BUTTON_C
+  // 0x49,  // BUTTON_X
+  // 0x4a,  // BUTTON_Y
+  // 0x4b,  // BUTTON_Z
 };
 
 u8 const hid2ps2_3[] = {

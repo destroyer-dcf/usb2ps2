@@ -116,7 +116,7 @@ u8 last_byte_sent = 0;
 void kb_send(u8 byte) {
   if (byte != KB_MSG_RESEND_FE)
     last_byte_sent = byte;
-  printf("kb > host %02x\n", byte);
+  printf("--d--> kb > host %02x\n", byte);
   queue_try_add(&kb_out.qbytes, &byte);
 }
 
@@ -129,6 +129,7 @@ void kb_maybe_send_prefix(u8 key) {
   u8 const *l = IS_MOD_KEY(key) ? ext_code_modifier_keys_1_2 : ext_code_keys_1_2;
   for (int i = 0; l[i]; i++) {
     if (key == l[i]) {
+      printf("send_prefix",KB_EXT_PFX_E0);
       kb_send(KB_EXT_PFX_E0);
       break;
     }
@@ -232,7 +233,7 @@ void kb_send_key_scs1(u8 key, bool is_key_pressed, bool is_ctrl) {
     key2repeat = key;
     if(repeater) cancel_alarm(repeater);
     repeater = add_alarm_in_ms(delay_ms, repeat_cb, NULL, false);
-
+   
     kb_send(scan_code);
   } else {
     // Cancel repeat

@@ -1,6 +1,9 @@
 #!/bin/bash
 
 export PICO_SDK_PATH=~/pico-sdk
+
+ARTIFACT="usb2ps2"
+
 echo "PICO_SDK_PATH ha sido configurado a $PICO_SDK_PATH"
 PROJECT_DIR="."
 BUILD_DIR="$PROJECT_DIR/build"
@@ -15,5 +18,7 @@ fi
 mkdir $BUILD_DIR
 cd $BUILD_DIR
 
-cmake ..
+cmake -DCMAKE_BUILD_TYPE=Debug .. 
 make
+cd ..
+# cp build/usb2ps2.uf2 /media/destroyer/RPI-RP2
