@@ -49,6 +49,7 @@ ps2in kb_in;
 #define KBHOSTCMD_SET_TYPEMATIC_PARAMS_F3 0xf3
 #define KBHOSTCMD_READ_ID_F2 0xf2
 #define KBHOSTCMD_SET_SCAN_CODE_SET_F0 0xf0
+#define KBHOSTCMD_SET_SCAN_CODE_SET_E2 0xe2
 #define KBHOSTCMD_ECHO_EE 0xee
 #define KBHOSTCMD_SET_LEDS_ED 0xed
 
@@ -58,6 +59,11 @@ ps2in kb_in;
 #define KB_MSG_ECHO_EE 0xee
 #define KB_MSG_ACK_FA 0xfa
 #define KB_MSG_RESEND_FE 0xfe
+
+// ADD -> DESTROYER
+bool button_pressed = false;  // Estado del botón
+// END - DESTROYER
+
 
 typedef enum {
   KBH_STATE_IDLE,
@@ -83,6 +89,7 @@ scs3_mode_enum_t scs3_mode = SCS3_MODE_MAKE_BREAK_TYPEMATIC;
 #define SCAN_CODE_SET_1 1
 #define SCAN_CODE_SET_2 2
 #define SCAN_CODE_SET_3 3
+#define SCAN_CODE_SET_4 4
 
 u8 scancodeset = SCAN_CODE_SET_2;
 
@@ -114,9 +121,14 @@ u8 key2repeat = 0;
 u8 last_byte_sent = 0;
 
 void kb_send(u8 byte) {
-  if (byte != KB_MSG_RESEND_FE)
+  if (byte != KB_MSG_RESEND_FE){
     last_byte_sent = byte;
-  printf("--d--> kb > host %02x\n", byte);
+  } else {
+    printf("NO TENGO NI PUTA IDEA");
+  }
+  printf("----> ENVIA SCANCODE: %02x\n", byte);
+// printf("Dirección de kb_out.qbytes: %p\n", (void *)&kb_out.qbytes);
+// printf("Dirección de last_byte_sent: %p\n", (void *)&last_byte_sent);
   queue_try_add(&kb_out.qbytes, &byte);
 }
 
@@ -162,8 +174,8 @@ s64 blink_callback() {
 }
 
 void set_scancodeset(u8 scs) {
+  // printf("----> SCANCODE SET: %u\n", scs);
   scancodeset = scs;
-  printf("scancodeset set to %u\n", scancodeset);
 }
 
 void kb_set_defaults() {
@@ -193,6 +205,7 @@ s64 repeat_cb() {
       break;
       case SCAN_CODE_SET_3:
         IS_MOD_KEY(key2repeat) ? kb_send(mod2ps2_3[key2repeat - HID_KEY_CONTROL_LEFT]) : kb_send(hid2ps2_3[key2repeat]);
+
       break;
       default:
         repeater = 0;
@@ -207,7 +220,8 @@ s64 repeat_cb() {
 #define LOG_UNMAPPED_KEY printf("WARNING: Unmapped HID key 0x%x in set %d, ignoring it!\n",key,scancodeset);
 
 void kb_send_key_scs1(u8 key, bool is_key_pressed, bool is_ctrl) {
-
+  printf("***** KEYBOARD CONTROL\n");
+  printf("----> KEY VALUE: %u\n", key);
   // PrintScreen and Pause have special sequences that must be sent.
   // Pause doesn't have a break code.
   if(key == HID_KEY_PAUSE || key == HID_KEY_PRINT_SCREEN) {
@@ -233,7 +247,7 @@ void kb_send_key_scs1(u8 key, bool is_key_pressed, bool is_ctrl) {
     key2repeat = key;
     if(repeater) cancel_alarm(repeater);
     repeater = add_alarm_in_ms(delay_ms, repeat_cb, NULL, false);
-   
+  printf("2--> %d\n", scan_code);
     kb_send(scan_code);
   } else {
     // Cancel repeat
@@ -241,9 +255,13 @@ void kb_send_key_scs1(u8 key, bool is_key_pressed, bool is_ctrl) {
 
     kb_send(scan_code | 0x80);
   }
+  printf("***********************\n");
 }
 
 void kb_send_key_scs2(u8 key, bool is_key_pressed, bool is_ctrl) {
+
+  printf("***** KEYBOARD CONTROL\n");
+  printf("----> KEY VALUE: %u\n", key);
 
   // PrintScreen and Pause have special sequences that must be sent.
   // Pause doesn't have a break code.
@@ -255,7 +273,14 @@ void kb_send_key_scs2(u8 key, bool is_key_pressed, bool is_ctrl) {
     return;
   }
 
-  u8 scan_code = IS_MOD_KEY(key) ? mod2ps2_2[key - HID_KEY_CONTROL_LEFT] : hid2ps2_2[key];
+  // u8 scan_code = IS_MOD_KEY(key) ? mod2ps2_2[key - HID_KEY_CONTROL_LEFT] : hid2ps2_2[key];
+    u8 scan_code;
+    if (IS_MOD_KEY(key)) {
+        scan_code = mod2ps2_2[key - HID_KEY_CONTROL_LEFT];
+    } else {
+        scan_code = hid2ps2_2[key];
+    }
+
 
   if (!scan_code) {
     LOG_UNMAPPED_KEY
@@ -267,18 +292,22 @@ void kb_send_key_scs2(u8 key, bool is_key_pressed, bool is_ctrl) {
 
   if (is_key_pressed) {
   // Take care of typematic repeat
+    printf("----> KEY PRESET: TRUE\n");
     key2repeat = key;
     if(repeater) cancel_alarm(repeater);
     repeater = add_alarm_in_ms(delay_ms, repeat_cb, NULL, false);
   } else {
+    printf("----> KEY PRESET: FALSE\n");
     if(key == key2repeat) key2repeat = 0;
     kb_send(KB_BREAK_2_3);
   }
   kb_send(scan_code);
+  printf("***********************\n");
 }
 
 void kb_send_key_scs3(u8 key, bool is_key_pressed) {
-
+  printf("***** KEYBOARD CONTROL\n");
+  printf("----> KEY VALUE: %u\n", key);
   u8 scan_code = IS_MOD_KEY(key) ? mod2ps2_3[key - HID_KEY_CONTROL_LEFT] : hid2ps2_3[key];
 
   if (!scan_code) {
@@ -296,7 +325,6 @@ void kb_send_key_scs3(u8 key, bool is_key_pressed) {
       if(repeater) cancel_alarm(repeater);
       repeater = add_alarm_in_ms(delay_ms, repeat_cb, NULL, false);
     }
-
     kb_send(scan_code);
   } else {
     if(key == key2repeat) key2repeat = 0;
@@ -310,32 +338,94 @@ void kb_send_key_scs3(u8 key, bool is_key_pressed) {
     }
   }
 }
+// ************************
+// GAMEPAD CONTROL
+// ************************
+void kb_send_key_gamepad_control(u8 key, bool is_key_pressed) {
+  printf("***** GAMEPAD CONTROL\n");
+  printf("----> KEY VALUE: %u\n", key);
+
+  // u8 scan_code = IS_MOD_KEY(key) ? mod2ps2_3[key - HID_KEY_CONTROL_LEFT] : hid2ps2_3[key];
+  u8 scan_code = gamepad_scancodes[key];
+  kb_send(KB_EXT_PFX_E0);
+  // if (!scan_code) {
+  //   printf("error \n");
+  //   LOG_UNMAPPED_KEY
+  //   return;
+  // }
+  kb_maybe_send_prefix(key);    
+  if (is_key_pressed) {
+  // keyboard.write(0xE2);
+  // delay(25);
+  // if (!press) {
+  //   keyboard.write(0xF0);
+  //   delay(25);
+  // }
+  // keyboard.write(scancode);
+
+  // #define KB_EXT_PFX_E0 0xe0 
+    // Take care of typematic repeat
+    printf("----> KEY PRESET: TRUE\n");
+    // if (
+    //   (scs3_mode == SCS3_MODE_MAKE_BREAK_TYPEMATIC || scs3_mode == SCS3_MODE_MAKE_TYPEMATIC)
+    //   && !(scs3keymodemap[scan_code] & KEYMODEMASK_TYPEMATIC)
+    // ) {
+    //   key2repeat = key;
+    //   if(repeater) cancel_alarm(repeater);
+    //   repeater = add_alarm_in_ms(delay_ms, repeat_cb, NULL, false);
+    // }
+    // printf ("3-> ", scan_code);
+
+      kb_send(scan_code);
+  } else {
+    printf("----> KEY PRESET: FALSE\n");
+    if(key == key2repeat) key2repeat = 0;
+
+    // if (
+    //   (scs3_mode == SCS3_MODE_MAKE_BREAK || scs3_mode == SCS3_MODE_MAKE_BREAK_TYPEMATIC)
+    //   && !(scs3keymodemap[scan_code] & KEYMODEMASK_BREAK)
+    // ) {
+    //   // printf("4--> %d\n", scan_code);
+      kb_send(KB_BREAK_2_3);
+      kb_send(scan_code);
+    // }
+  }
+}
+
 
 // Sends a key state change to the host
 // u8 keycode          - from hid.h HID_KEY_ definition
 // bool is_key_pressed - state of key: true=pressed, false=released
 void kb_send_key(u8 key, bool is_key_pressed, u8 modifiers) {
+  printf("MODIFIERS ES: %u\n", modifiers);
   if (!kb_enabled) {
     printf("WARNING: Keyboard disabled, ignoring key press %u\n", key);
     return;
   }
-
+  
   if(!IS_VALID_KEY(key)) {
     printf("INFO: Ignoring hid key 0x%x by design.\n", key);
     return;
   }
-  
-  bool is_ctrl = modifiers & KEYBOARD_MODIFIER_LEFTCTRL || modifiers & KEYBOARD_MODIFIER_RIGHTCTRL;
 
+  bool is_ctrl = modifiers & KEYBOARD_MODIFIER_LEFTCTRL || modifiers & KEYBOARD_MODIFIER_RIGHTCTRL;
   switch (scancodeset) {
     case SCAN_CODE_SET_1:
+      printf("----> SCANCODE SET 1\n");
       kb_send_key_scs1(key, is_key_pressed, is_ctrl);
       break;
     case SCAN_CODE_SET_2:
+      printf("----> SCANCODE SET 2\n");
       kb_send_key_scs2(key, is_key_pressed, is_ctrl);
       break;
     case SCAN_CODE_SET_3:
+      printf("----> SCANCODE SET 3\n");
       kb_send_key_scs3(key, is_key_pressed);
+      break;
+    case SCAN_CODE_SET_4:
+      printf("----> SCANCODE SET 4\n");
+      kb_send_key_gamepad_control(key, is_key_pressed);
+      //kb_send_key_scs2(key, is_key_pressed, is_ctrl);
       break;
     default:
       printf("INTERNAL ERROR! SCAN CODE SET = %u\n", scancodeset);
@@ -458,6 +548,10 @@ void kb_receive(u8 byte, u8 prev_byte) {
         case SCAN_CODE_SET_3:
           memchr(scs3keymodemap,0,sizeof(scs3keymodemap));
           set_scancodeset(byte);
+          break;
+        case SCAN_CODE_SET_4:
+          printf("Estoy en el 4-1");
+          set_scancodeset(4);
           break;
         default:
           printf("WARNING: scancodeset requested to set to unknown value %u by host, defaulting to 2\n",byte);
@@ -631,8 +725,75 @@ bool kb_task() {
 }
 
 void kb_init(u8 gpio_out, u8 gpio_in) {
+  printf("GPIO OUT %02x\n", gpio_out);
+  printf("GPIO IN %02x\n", gpio_in);
   ps2out_init(&kb_out, pio0, gpio_out, &kb_receive);
   ps2in_init(&kb_in, pio1, gpio_in);
   kb_set_defaults();
   kb_send(KB_MSG_SELFTEST_PASSED_AA);
+}
+
+// // Función para verificar el estado del botón
+// void check_button() {
+//     if (gpio_get(BUTTON_TESTING) == 0) {
+//         if (!button_pressed) {  // Si no estaba presionado antes
+//             kb_send_key_scs2(13, 0, 0);
+//             // printf("Hola\n");
+//             button_pressed = true;  // Marca el botón como presionado
+            
+//         }
+//     } else {
+//         button_pressed = false;  // Resetea el estado cuando el botón se suelta
+//     }
+// }
+void send_Joy_Action(int scancode, bool press) {
+  kb_send(KBHOSTCMD_SET_SCAN_CODE_SET_E2);
+  sleep_ms(25);
+  if (!press) {
+    kb_send(KBHOSTCMD_SET_SCAN_CODE_SET_F0);
+    sleep_ms(25);
+  }
+  kb_send(scancode);
+  sleep_ms(25);
+}
+
+
+
+void check_button() {
+    set_scancodeset(4);
+    bool current_state = !gpio_get(BUTTON_TESTING);  // Leer el estado actual del botón (inverso porque está en pull-up)
+    set_scancodeset(4);
+    // Detectar cuando el botón pasa de no presionado a presionado
+    // kb_send(KB_EXT_PFX_E0);
+    // sleep_ms(25);
+    if (current_state && !button_pressed) {
+        // set_scancodeset(4);
+        button_pressed = true;
+        send_Joy_Action(0x42, true);
+        // kb_send_key_gam3epad_control(0, button_pressed); // Enviar código como si se presionara
+        //kb_send_key(35, button_pressed,0);
+        //  kb_send(0x40);
+        //  sleep_ms(25);
+        kb_send_key_gamepad_control(1, button_pressed);
+        // Enviar el código PS/2 cuando el botón es presionado
+        // kb_send(0x40); // Código de ejemplo (enviar el código que necesites)
+        // kb_send_key_scs2(40,0,0);
+    } 
+    else if (!current_state && button_pressed) {
+        button_pressed = false;
+        send_Joy_Action(0x42, false);
+        // kb_send(KB_BREAK_2_3);
+        // kb_send(0x40);
+        // sleep_ms(25);
+        //kb_send_key(35, button_pressed,0);
+        kb_send_key_gamepad_control(1, button_pressed);
+                // sleep_ms(50); // Esperar un poco antes de enviar el siguiente
+        // kb_send_key_gamepad_control(0, button_pressed); // Liberar el código
+        // kb_send_key_scs2(0x1C,1,0);
+        // Enviar el código de liberación (soltar la tecla)
+        // kb_send(0xF0); // Código para "break"
+        // kb_send(0x40); // Mismo código de tecla para indicar que se suelta
+    }
+    set_scancodeset(2);
+
 }

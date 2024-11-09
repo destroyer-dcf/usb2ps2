@@ -68,7 +68,7 @@ void ps2out_task(ps2out* this) {
       i++;
       pack[i] = byte;
     }
-    
+
     pack[0] = i;
     queue_try_add(&this->qpacks, &pack);
   }

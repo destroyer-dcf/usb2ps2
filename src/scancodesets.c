@@ -81,6 +81,21 @@ u8 const prt_scn_break_2[] = { 0xe0, 0xf0, 0x7c, 0xe0, 0xf0, 0x12, 0 };
 u8 const break_make_2[]    = { 0xe0, 0x7e, 0xe0, 0xf0, 0x7e, 0 };
 u8 const pause_make_2[]    = { 0xe1, 0x14, 0x77, 0xe1, 0xf0, 0x14, 0xf0, 0x77, 0 };
 
+u8 const gamepad_scancodes[] = {
+    0x40,  // LEFT
+    0x41,  // RIGHT
+    0x42,  // UP
+    0x43,  // DOWN
+    0x44,  // START
+    0x45,  // MODE
+    0x46,  // BUTTON_A
+    0x47,  // BUTTON_B
+    0x48,  // BUTTON_C
+    0x49,  // BUTTON_X
+    0x4A,  // BUTTON_Y
+    0x4B   // BUTTON_Z
+};
+
 // break codes in set 1 are created from the make code by adding 128 (0x80) or in other words set the msb.
 // this is true even for the extended codes (but 0xe0 stays 0xe0) and the special multi byte codes for print screen and pause
 u8 const mod2ps2_1[] = {
@@ -298,7 +313,7 @@ u8 const hid2ps2_2[] = {
   0x4c, // ;
   0x52, // ' APOSTROPHE
   0x0e, // ` GRAVE
-  0x41, // ,
+  0x41, // COMMA
   0x49, // .
   0x4a, // /
   0x58, // CAPS
@@ -331,52 +346,203 @@ u8 const hid2ps2_2[] = {
   0x75, // U ARROW
   0x77, // NUM
   0x4a, // KP /
-  0x7c, // KP *
+  0x7c, // ASTERISK
   0x7b, // KP -
   0x79, // KP +
   0x5a, // KP EN
-  0x69, // KP 1
-  0x72, // KP 2
-  0x7a, // KP 3
-  0x6b, // KP 4
-  0x73, // KP 5
-  0x74, // KP 6
-  0x6c, // KP 7
-  // 0x60 - 0x6f
-  0x75, // KP 8
-  0x7d, // KP 9
-  0x70, // KP 0
-  0x71, // KP .
+  0x69, // NUMPAD_ONE
+  0x72, // NUMPAD_TWO
+  0x7a, // NUMPAD_THREE
+  0x6b, // NUMPAD_FOUR
+  0x73, // NUMPAD_FIVE
+  0x74, // NUMPAD_SIX
+  0x6c, // NUMPAD_SEVEN
+  0x75, // NUMPAD_EIGHT
+  0x7d, // NUMPAD_NINE
+  0x70, // NUMPAD_ZERO
+  0x71, // DECIMAL
   0x61, // EUROPE_2
   0x2f, // APPS
   0x37, // POWER
   0x0f, // KEYPAD_EQUAL
-  0x08, // F13
-  0x10, // F14
-  0x18, // F15
-  0x20, // F16
-  0x28, // F17
-  0x30, // F18
-  0x38, // F19
-  0x40, // F20
-  // 0x70 - 0x73
-  0x48, // F21
-  0x50, // F22
-  0x57, // F23
-  0x5f,  // F24
-  // 0x40,  // LEFT
-  // 0x41,  // RIGHT
-  // 0x42,  // UP
-  // 0x43,  // DOWN
-  // 0x44,  // START
-  // 0x45,  // MODE
-  // 0x46,  // BUTTON_A
-  // 0x47,  // BUTTON_B
-  // 0x48,  // BUTTON_C
-  // 0x49,  // BUTTON_X
-  // 0x4a,  // BUTTON_Y
-  // 0x4b,  // BUTTON_Z
+  // 0x08, // F13
+  // 0x10, // F14
+  // 0x18, // F15
+  // 0x20, // F16
+  // 0x28, // F17
+  // 0x30, // F18
+  // 0x38, // F19
+  // 0x40, // F20
+  // // 0x70 - 0x73
+  // 0x48, // F21
+  // 0x50, // F22
+  // 0x57, // F23
+  // 0x5f,  // F24
+  0x40,  // LEFT - 117
+  0x41,  // RIGHT - 118
+  0x42,  // UP - 119
+  0x43,  // DOWN - 120
+  0x44,  // START - 121
+  0x45,  // MODE - 122
+  0x46,  // BUTTON_A -123
+  0x47,  // BUTTON_B - 124
+  0x48,  // BUTTON_C - 125
+  0x49,  // BUTTON_X - 126
+  0x4A,  // BUTTON_Y - 127
+  0x4B   // BUTTON_Z - 128
 };
+
+
+    // 0x40,  // LEFT
+    // 0x41,  // RIGHT
+    // 0x42,  // UP
+    // 0x43,  // DOWN
+    // 0x44,  // START
+    // 0x45,  // MODE
+    // 0x46,  // BUTTON_A
+    // 0x47,  // BUTTON_B
+    // 0x48,  // BUTTON_C
+    // 0x49,  // BUTTON_X
+    // 0x4A,  // BUTTON_Y
+    // 0x4B   // BUTTON_Z
+
+// u8 const hid2ps2_2[] = {
+//   // 0x00 - 0x0f
+//   0, 0, 0, 0, // NONE
+//   0x1c, // A
+//   0x32, // B
+//   0x21, // C
+//   0x23, // D
+//   0x24, // E
+//   0x2b, // F
+//   0x34, // G
+//   0x33, // H
+//   0x43, // I
+//   0x3b, // J
+//   0x42, // K
+//   0x4b, // L
+//   // 0x10 - 0x1f
+//   0x3a, // M
+//   0x31, // N
+//   0x44, // O
+//   0x4d, // P
+//   0x15, // Q
+//   0x2d, // R
+//   0x1b, // S
+//   0x2c, // T
+//   0x3c, // U
+//   0x2a, // V
+//   0x1d, // W
+//   0x22, // X
+//   0x35, // Y
+//   0x1a, // Z
+//   0x16, // 1
+//   0x1e, // 2
+//   // 0x20 - 0x2f
+//   0x26, // 3
+//   0x25, // 4
+//   0x2e, // 5
+//   0x36, // 6
+//   0x3d, // 7
+//   0x3e, // 8
+//   0x46, // 9
+//   0x45, // 0
+//   0x5a, // ENTER
+//   0x76, // ESC
+//   0x66, // BACKSPACE
+//   0x0d, // TAB
+//   0x29, // SPACE
+//   0x4e, // -
+//   0x55, // =
+//   0x54, // [
+//   // 0x30 - 0x3f
+//   0x5b, // ]
+//   0x5d, // BACKSLASH
+//   0x5d, // EUROPE_1
+//   0x4c, // ;
+//   0x52, // ' APOSTROPHE
+//   0x0e, // ` GRAVE
+//   0x41, // ,
+//   0x49, // .
+//   0x4a, // /
+//   0x58, // CAPS
+//   0x05, // F1
+//   0x06, // F2
+//   0x04, // F3
+//   0x0c, // F4
+//   0x03, // F5
+//   0x0b, // F6
+//   // 0x40 - 0x4f
+//   0x83, // F7
+//   0x0a, // F8
+//   0x01, // F9
+//   0x09, // F10
+//   0x78, // F11
+//   0x07, // F12
+//   0x7c, // PRNT SCRN
+//   0x7e, // SCROLL
+//   0x7e, // PAUSE
+//   0x70, // INSERT
+//   0x6c, // HOME
+//   0x7d, // PG UP
+//   0x71, // DELETE
+//   0x69, // END
+//   0x7a, // PD DN
+//   0x74, // R ARROW
+//   // 0x50 - 0x5f
+//   0x6b, // L ARROW
+//   0x72, // D ARROW
+//   0x75, // U ARROW
+//   0x77, // NUM
+//   0x4a, // KP /
+//   0x7c, // KP *
+//   0x7b, // KP -
+//   0x79, // KP +
+//   0x5a, // KP EN
+//   0x69, // KP 1
+//   0x72, // KP 2
+//   0x7a, // KP 3
+//   0x6b, // KP 4
+//   0x73, // KP 5
+//   0x74, // KP 6
+//   0x6c, // KP 7
+//   // 0x60 - 0x6f
+//   0x75, // KP 8
+//   0x7d, // KP 9
+//   0x70, // KP 0
+//   0x71, // KP .
+//   0x61, // EUROPE_2
+//   0x2f, // APPS
+//   0x37, // POWER
+//   0x0f, // KEYPAD_EQUAL
+//   0x08, // F13
+//   0x10, // F14
+//   0x18, // F15
+//   0x20, // F16
+//   0x28, // F17
+//   0x30, // F18
+//   0x38, // F19
+//   0x40, // F20
+//   // 0x70 - 0x73
+//   0x48, // F21
+//   0x50, // F22
+//   0x57, // F23
+//   0x5f,  // F24
+
+//   // 0x40,  // LEFT
+//   // 0x41,  // RIGHT
+//   // 0x42,  // UP
+//   // 0x43,  // DOWN
+//   // 0x44,  // START
+//   // 0x45,  // MODE
+//   // 0x46,  // BUTTON_A
+//   // 0x47,  // BUTTON_B
+//   // 0x48,  // BUTTON_C
+//   // 0x49,  // BUTTON_X
+//   // 0x4A,  // BUTTON_Y
+//   // 0x4B   // BUTTON_Z
+// };
+
 
 u8 const hid2ps2_3[] = {
   // 0x00 - 0x0f

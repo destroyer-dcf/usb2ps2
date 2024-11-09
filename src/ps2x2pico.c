@@ -164,34 +164,24 @@ void tuh_hid_report_received_cb(u8 dev_addr, u8 instance, u8 const* report, u16 
   }
 }
 
-bool button_pressed = false;  // Estado del botón
+
 uint32_t last_button_check = 0;  // Última vez que se verificó el botón
 
-// Función para verificar el estado del botón
-void check_button() {
-    if (gpio_get(BUTTON_TESTING) == 0) {
-        if (!button_pressed) {  // Si no estaba presionado antes
-            printf("Hola\n");
-            button_pressed = true;  // Marca el botón como presionado
-            
-        }
-    } else {
-        button_pressed = false;  // Resetea el estado cuando el botón se suelta
-    }
-}
+
 
 void main() {
   board_init();
   printf("\n%s-%s\n", PICO_PROGRAM_NAME, PICO_PROGRAM_VERSION_STRING);
-  printf("Programa iniciado. Esperando presionar el botón...\n");
-
-  gpio_init(BUTTON_TESTING);
 
   gpio_init(LVOUT);
   gpio_init(LVIN);
 
+  // ADD - DESTROYER
+  printf("Waiting for ESPectrum...\n");
+  gpio_init(BUTTON_TESTING);
   gpio_set_dir(BUTTON_TESTING, GPIO_IN);
   gpio_pull_up(BUTTON_TESTING);  // Habilita resistencia pull-up interna
+  // END - DESTROYER
 
   gpio_set_dir(LVOUT, GPIO_OUT);
   gpio_set_dir(LVIN, GPIO_OUT);
@@ -204,15 +194,16 @@ void main() {
   
 
     while (1) {
-        uint32_t current_time = time_us_32();  // Obtener tiempo actual en microsegundos
 
-        // Verifica el botón cada 200 ms
+        // ADD -> DESTROYER
+        uint32_t current_time = time_us_32();  // Obtener tiempo actual en microsegundos
         if (current_time - last_button_check >= DEBOUNCE_TIME * 1000) {
+            
             check_button();  // Verifica el estado del botón
             last_button_check = current_time;  // Actualiza la última verificación
         }
+        // END - DESTROYER
 
-        // Ejecuta las tareas de kb y ms
         tuh_task();
         kb_task();
         ms_task();

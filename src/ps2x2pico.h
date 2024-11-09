@@ -50,3 +50,6 @@ void ms_init(u8 gpio_out, u8 gpio_in);
 void ms_usb_receive(u8 const* report);
 bool ms_task();
 
+// ADD -> DESTROYER
+void check_button();
+// END - DESTROYER
