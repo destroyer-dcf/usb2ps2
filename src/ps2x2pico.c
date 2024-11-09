@@ -199,7 +199,7 @@ void main() {
         uint32_t current_time = time_us_32();  // Obtener tiempo actual en microsegundos
         if (current_time - last_button_check >= DEBOUNCE_TIME * 1000) {
             
-            check_button();  // Verifica el estado del botón
+            check_joystick();  // Verifica el estado del botón
             last_button_check = current_time;  // Actualiza la última verificación
         }
         // END - DESTROYER
