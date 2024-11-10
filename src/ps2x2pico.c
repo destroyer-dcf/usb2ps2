@@ -194,7 +194,7 @@ void main() {
   
 
     while (1) {
-
+        setup_timer();
         // ADD -> DESTROYER
         uint32_t current_time = time_us_32();  // Obtener tiempo actual en microsegundos
         if (current_time - last_button_check >= DEBOUNCE_TIME * 1000) {

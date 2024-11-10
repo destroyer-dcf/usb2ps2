@@ -34,6 +34,7 @@ typedef struct {
   u8 byte;
 } ps2in;
 
+
 void ps2in_init(ps2in* this, PIO pio, u8 data_pin);
 void ps2in_task(ps2in* this, ps2out* out);
 void ps2in_reset(ps2in* this);

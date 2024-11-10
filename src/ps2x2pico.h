@@ -51,5 +51,6 @@ void ms_usb_receive(u8 const* report);
 bool ms_task();
 
 // ADD -> DESTROYER
-// void check_joystick();
+void setup_timer();
+void check_joystick();
 // END - DESTROYER
