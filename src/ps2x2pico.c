@@ -303,115 +303,59 @@ void check_joystick(GamePad* gamepad) {
     if (currentState != lastState) {
         // Verificar el cambio de estado para cada botón
         if ((currentState & SC_BTN_UP) != (lastState & SC_BTN_UP)) {
-            if (currentState & SC_BTN_UP) {
-                send_joy_action(ESP_JOY1UP, true);
-            } else {
-                send_joy_action(ESP_JOY1UP, false);
-            }
+            send_joy_action(ESP_JOY1UP, (currentState & SC_BTN_UP) != 0);
         }
 
         if ((currentState & SC_BTN_DOWN) != (lastState & SC_BTN_DOWN)) {
-            if (currentState & SC_BTN_DOWN) {
-                send_joy_action(ESP_JOY1DOWN, true);
-            } else {
-                send_joy_action(ESP_JOY1DOWN, false);
-            }
+            send_joy_action(ESP_JOY1DOWN, (currentState & SC_BTN_DOWN) != 0);
         }
 
         if ((currentState & SC_BTN_LEFT) != (lastState & SC_BTN_LEFT)) {
-            if (currentState & SC_BTN_LEFT) {
-                send_joy_action(ESP_JOY1LEFT, true);
-            } else {
-                send_joy_action(ESP_JOY1LEFT, false);
-            }
+            send_joy_action(ESP_JOY1LEFT, (currentState & SC_BTN_LEFT) != 0);
         }
 
         if ((currentState & SC_BTN_RIGHT) != (lastState & SC_BTN_RIGHT)) {
-            if (currentState & SC_BTN_RIGHT) {
-                send_joy_action(ESP_JOY1RIGHT, true);
-            } else {
-                send_joy_action(ESP_JOY1RIGHT, false);
-            }
+            send_joy_action(ESP_JOY1RIGHT, (currentState & SC_BTN_RIGHT) != 0);
         }
 
         if ((currentState & SC_BTN_START) != (lastState & SC_BTN_START)) {
-            if (currentState & SC_BTN_START) {
-                send_joy_action(ESP_JOY1START, true);
-            } else {
-                send_joy_action(ESP_JOY1START, false);
-            }
+            send_joy_action(ESP_JOY1START, (currentState & SC_BTN_START) != 0);
         }
 
         if ((currentState & SC_BTN_A) != (lastState & SC_BTN_A)) {
-            if (currentState & SC_BTN_A) {
-                send_joy_action(ESP_JOY1A, true);
-            } else {
-                send_joy_action(ESP_JOY1A, false);
-            }
+            send_joy_action(ESP_JOY1A, (currentState & SC_BTN_A) != 0);
         }
 
         if ((currentState & SC_BTN_B) != (lastState & SC_BTN_B)) {
-            if (currentState & SC_BTN_B) {
-                send_joy_action(ESP_JOY1B, true);
-            } else {
-                send_joy_action(ESP_JOY1B, false);
-            }
+            send_joy_action(ESP_JOY1B, (currentState & SC_BTN_B) != 0);
         }
 
         if ((currentState & SC_BTN_C) != (lastState & SC_BTN_C)) {
-            if (currentState & SC_BTN_C) {
-                send_joy_action(ESP_JOY1C, true);
-            } else {
-                send_joy_action(ESP_JOY1C, false);
-            }
+            send_joy_action(ESP_JOY1C, (currentState & SC_BTN_C) != 0);
         }
 
         if ((currentState & SC_BTN_X) != (lastState & SC_BTN_X)) {
-            if (currentState & SC_BTN_X) {
-                send_joy_action(ESP_JOY1X, true);
-            } else {
-                send_joy_action(ESP_JOY1X, false);
-            }
+            send_joy_action(ESP_JOY1X, (currentState & SC_BTN_X) != 0);
         }
 
         if ((currentState & SC_BTN_Y) != (lastState & SC_BTN_Y)) {
-            if (currentState & SC_BTN_Y) {
-                send_joy_action(ESP_JOY1Y, true);
-            } else {
-                send_joy_action(ESP_JOY1Y, false);
-            }
+            send_joy_action(ESP_JOY1Y, (currentState & SC_BTN_Y) != 0);
         }
 
         if ((currentState & SC_BTN_Z) != (lastState & SC_BTN_Z)) {
-            if (currentState & SC_BTN_Z) {
-                send_joy_action(ESP_JOY1Z, true);
-            } else {
-                send_joy_action(ESP_JOY1Z, false);
-            }
+            send_joy_action(ESP_JOY1Z, (currentState & SC_BTN_Z) != 0);
         }
 
         if ((currentState & SC_BTN_1) != (lastState & SC_BTN_1)) {
-            if (currentState & SC_BTN_1) {
-                send_joy_action(ESP_JOY1A, true);
-            } else {
-                send_joy_action(ESP_JOY1A, false);
-            }
+            send_joy_action(ESP_JOY1A, (currentState & SC_BTN_1) != 0);
         }
 
         if ((currentState & SC_BTN_2) != (lastState & SC_BTN_2)) {
-            if (currentState & SC_BTN_2) {
-                send_joy_action(ESP_JOY1Z, true);
-            } else {
-                send_joy_action(ESP_JOY1Z, false);
-            }
+            send_joy_action(ESP_JOY1Z, (currentState & SC_BTN_2) != 0);
         }
 
         if ((currentState & SC_BTN_MODE) != (lastState & SC_BTN_MODE)) {
-            if (currentState & SC_BTN_MODE) {
-                send_joy_action(ESP_JOY1MODE, true);
-            } else {
-                send_joy_action(ESP_JOY1MODE, false);
-            }
+            send_joy_action(ESP_JOY1MODE, (currentState & SC_BTN_MODE) != 0);
         }
 
         // Actualiza el estado anterior después de procesar el cambio
