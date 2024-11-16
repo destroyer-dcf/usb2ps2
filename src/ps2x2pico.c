@@ -63,7 +63,7 @@ static uint16_t currentState = 0; // Declara lastState para almacenar el estado 
 #define ESP_JOY1X 0x49
 #define ESP_JOY1Y 0x4a
 #define ESP_JOY1Z 0x4b
-
+#define DEBOUNCE_DELAY_MS 50
 //######################################################################################################################
 
 u8 kb_addr = 0;
@@ -73,6 +73,17 @@ char device_str[50];
 char manufacturer_str[50];
 
 
+
+bool debounce(uint16_t currentState, uint16_t lastState, uint16_t button) {
+    static uint32_t lastDebounceTime = 0;
+    uint32_t currentTime = to_ms_since_boot(get_absolute_time());
+
+    if ((currentState & button) != (lastState & button)) {
+        lastDebounceTime = currentTime;
+    }
+
+    return (currentTime - lastDebounceTime) > DEBOUNCE_DELAY_MS;
+}
 void tuh_kb_set_leds(u8 leds) {
   if(kb_addr) {
     kb_leds = leds;
@@ -302,59 +313,59 @@ void check_joystick(GamePad* gamepad) {
     // Verificar el cambio de estado para cada botón, evitando el rebote
     if (currentState != lastState) {
         // Verificar el cambio de estado para cada botón
-        if ((currentState & SC_BTN_UP) != (lastState & SC_BTN_UP)) {
+        if (debounce(currentState, lastState, SC_BTN_UP)) {
             send_joy_action(ESP_JOY1UP, (currentState & SC_BTN_UP) != 0);
         }
 
-        if ((currentState & SC_BTN_DOWN) != (lastState & SC_BTN_DOWN)) {
+        if (debounce(currentState, lastState, SC_BTN_DOWN)) {
             send_joy_action(ESP_JOY1DOWN, (currentState & SC_BTN_DOWN) != 0);
         }
 
-        if ((currentState & SC_BTN_LEFT) != (lastState & SC_BTN_LEFT)) {
+        if (debounce(currentState, lastState, SC_BTN_LEFT)) {
             send_joy_action(ESP_JOY1LEFT, (currentState & SC_BTN_LEFT) != 0);
         }
 
-        if ((currentState & SC_BTN_RIGHT) != (lastState & SC_BTN_RIGHT)) {
+        if (debounce(currentState, lastState, SC_BTN_RIGHT)) {
             send_joy_action(ESP_JOY1RIGHT, (currentState & SC_BTN_RIGHT) != 0);
         }
 
-        if ((currentState & SC_BTN_START) != (lastState & SC_BTN_START)) {
+        if (debounce(currentState, lastState, SC_BTN_START)) {
             send_joy_action(ESP_JOY1START, (currentState & SC_BTN_START) != 0);
         }
 
-        if ((currentState & SC_BTN_A) != (lastState & SC_BTN_A)) {
+        if (debounce(currentState, lastState, SC_BTN_A)) {
             send_joy_action(ESP_JOY1A, (currentState & SC_BTN_A) != 0);
         }
 
-        if ((currentState & SC_BTN_B) != (lastState & SC_BTN_B)) {
+        if (debounce(currentState, lastState, SC_BTN_B)) {
             send_joy_action(ESP_JOY1B, (currentState & SC_BTN_B) != 0);
         }
 
-        if ((currentState & SC_BTN_C) != (lastState & SC_BTN_C)) {
+        if (debounce(currentState, lastState, SC_BTN_C)) {
             send_joy_action(ESP_JOY1C, (currentState & SC_BTN_C) != 0);
         }
 
-        if ((currentState & SC_BTN_X) != (lastState & SC_BTN_X)) {
+        if (debounce(currentState, lastState, SC_BTN_X)) {
             send_joy_action(ESP_JOY1X, (currentState & SC_BTN_X) != 0);
         }
 
-        if ((currentState & SC_BTN_Y) != (lastState & SC_BTN_Y)) {
+        if (debounce(currentState, lastState, SC_BTN_Y)) {
             send_joy_action(ESP_JOY1Y, (currentState & SC_BTN_Y) != 0);
         }
 
-        if ((currentState & SC_BTN_Z) != (lastState & SC_BTN_Z)) {
+        if (debounce(currentState, lastState, SC_BTN_Z)) {
             send_joy_action(ESP_JOY1Z, (currentState & SC_BTN_Z) != 0);
         }
 
-        if ((currentState & SC_BTN_1) != (lastState & SC_BTN_1)) {
+        if (debounce(currentState, lastState, SC_BTN_1)) {
             send_joy_action(ESP_JOY1A, (currentState & SC_BTN_1) != 0);
         }
 
-        if ((currentState & SC_BTN_2) != (lastState & SC_BTN_2)) {
+        if (debounce(currentState, lastState, SC_BTN_2)) {
             send_joy_action(ESP_JOY1Z, (currentState & SC_BTN_2) != 0);
         }
 
-        if ((currentState & SC_BTN_MODE) != (lastState & SC_BTN_MODE)) {
+        if (debounce(currentState, lastState, SC_BTN_MODE)) {
             send_joy_action(ESP_JOY1MODE, (currentState & SC_BTN_MODE) != 0);
         }
 
