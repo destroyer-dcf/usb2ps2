@@ -29,7 +29,8 @@
 #include "hardware/gpio.h"
 #include "ps2joy.h"
 #include <stdbool.h>
-// #include "GamePad.h"
+#include "button.h"
+
 
 #define SCAN_CODE_SET_F0 0xf0
 #define SCAN_CODE_SET_E2 0xe2
@@ -46,6 +47,7 @@
 #define ESP_JOY1X 0x49
 #define ESP_JOY1Y 0x4a
 #define ESP_JOY1Z 0x4b
+
 // #define ESP_JOY2LEFT 0x4c
 // #define ESP_JOY2RIGHT 0x4d
 // #define ESP_JOY2UP 0x4e
@@ -69,6 +71,15 @@
 // DB9 Pin 7 --> GPIO 7 (PIN 10) -> SELECT
 // DB9 Pin 8 --> GND    (PIN 8) --> -----
 // DB9 Pin 9 --> GPIO 8 (PIN 11) -> 
+
+#define GAMEPAD_SELECT 7
+#define GAMEPAD_UP 2 
+#define GAMEPAD_DOWN 3
+#define GAMEPAD_LEFT 4 
+#define GAMEPAD_RIGHT 5 
+#define GAMEPAD_FIRE 6 
+#define GAMEPAD_MODE 8 // Es mode???
+
 
 bool button_pressed = false;  
 
@@ -177,7 +188,6 @@ void send_joy_action(u8 scancode, bool press) {
 
 
 
-// Variable global para llevar el conteo de milisegundos
 static uint32_t milliseconds = 0;
 
 // Función callback que se ejecuta cada milisegundo
@@ -206,7 +216,7 @@ void check_joystick() {
 
     // Inicializa el GamePad solo una vez
     if (!initialized) {
-        GamePad_init(&gamepad, 7, 2, 3, 4, 5, 6, 8);
+        GamePad_init(&gamepad, GAMEPAD_SELECT, GAMEPAD_UP, GAMEPAD_DOWN, GAMEPAD_LEFT, GAMEPAD_RIGHT, GAMEPAD_FIRE, 8);
         initialized = true;
     }
 
@@ -217,7 +227,7 @@ void check_joystick() {
     
     // SC_BTN_UP
     if ((currentState & SC_BTN_UP) != (lastState & SC_BTN_UP)) {
-        if (currentMillis - lastDebounceTime > 50) {  // 50ms de debounce
+        if (currentMillis - lastDebounceTime > SLEEP_TIME) {  // 50ms de debounce
             if (currentState & SC_BTN_UP) {
                 send_joy_action(ESP_JOY1UP, true);
             } else {
@@ -229,7 +239,7 @@ void check_joystick() {
 
     // SC_BTN_DOWN
     if ((currentState & SC_BTN_DOWN) != (lastState & SC_BTN_DOWN)) {
-        if (currentMillis - lastDebounceTime > 50) {
+        if (currentMillis - lastDebounceTime > SLEEP_TIME) {
             if (currentState & SC_BTN_DOWN) {
                 send_joy_action(ESP_JOY1DOWN, true);
             } else {
@@ -241,7 +251,7 @@ void check_joystick() {
 
     // SC_BTN_LEFT
     if ((currentState & SC_BTN_LEFT) != (lastState & SC_BTN_LEFT)) {
-        if (currentMillis - lastDebounceTime > 50) {
+        if (currentMillis - lastDebounceTime > SLEEP_TIME) {
             if (currentState & SC_BTN_LEFT) {
                 send_joy_action(ESP_JOY1LEFT, true);
             } else {
@@ -253,7 +263,7 @@ void check_joystick() {
 
     // SC_BTN_RIGHT
     if ((currentState & SC_BTN_RIGHT) != (lastState & SC_BTN_RIGHT)) {
-        if (currentMillis - lastDebounceTime > 50) {
+        if (currentMillis - lastDebounceTime > SLEEP_TIME) {
             if (currentState & SC_BTN_RIGHT) {
                 send_joy_action(ESP_JOY1RIGHT, true);
             } else {
@@ -265,7 +275,7 @@ void check_joystick() {
 
     // SC_BTN_START
     if ((currentState & SC_BTN_START) != (lastState & SC_BTN_START)) {
-        if (currentMillis - lastDebounceTime > 50) {
+        if (currentMillis - lastDebounceTime > SLEEP_TIME) {
             if (currentState & SC_BTN_START) {
                 send_joy_action(ESP_JOY1START, true);
             } else {
@@ -277,7 +287,7 @@ void check_joystick() {
 
     // SC_BTN_A
     if ((currentState & SC_BTN_A) != (lastState & SC_BTN_A)) {
-        if (currentMillis - lastDebounceTime > 50) {
+        if (currentMillis - lastDebounceTime > SLEEP_TIME) {
             if (currentState & SC_BTN_A) {
                 send_joy_action(ESP_JOY1A, true);
             } else {
@@ -289,7 +299,7 @@ void check_joystick() {
 
     // SC_BTN_B
     if ((currentState & SC_BTN_B) != (lastState & SC_BTN_B)) {
-        if (currentMillis - lastDebounceTime > 50) {
+        if (currentMillis - lastDebounceTime > SLEEP_TIME) {
             if (currentState & SC_BTN_B) {
                 send_joy_action(ESP_JOY1B, true);
             } else {
@@ -301,7 +311,7 @@ void check_joystick() {
 
     // SC_BTN_C
     if ((currentState & SC_BTN_C) != (lastState & SC_BTN_C)) {
-        if (currentMillis - lastDebounceTime > 50) {
+        if (currentMillis - lastDebounceTime > SLEEP_TIME) {
             if (currentState & SC_BTN_C) {
                 send_joy_action(ESP_JOY1C, true);
             } else {
@@ -313,7 +323,7 @@ void check_joystick() {
 
     // SC_BTN_X
     if ((currentState & SC_BTN_X) != (lastState & SC_BTN_X)) {
-        if (currentMillis - lastDebounceTime > 50) {
+        if (currentMillis - lastDebounceTime > SLEEP_TIME) {
             if (currentState & SC_BTN_X) {
                 send_joy_action(ESP_JOY1X, true);
             } else {
@@ -337,7 +347,7 @@ void check_joystick() {
 
     // SC_BTN_Z
     if ((currentState & SC_BTN_Z) != (lastState & SC_BTN_Z)) {
-        if (currentMillis - lastDebounceTime > 50) {
+        if (currentMillis - lastDebounceTime > 25) {
             if (currentState & SC_BTN_Z) {
                 send_joy_action(ESP_JOY1Z, true);
             } else {
@@ -349,7 +359,7 @@ void check_joystick() {
 
     // SC_BTN_1
     if ((currentState & SC_BTN_1) != (lastState & SC_BTN_1)) {
-        if (currentMillis - lastDebounceTime > 50) {
+        if (currentMillis - lastDebounceTime > 25) {
             if (currentState & SC_BTN_1) {
                 send_joy_action(ESP_JOY1A, true);
             } else {
@@ -400,7 +410,61 @@ void check_joystick() {
     
     
     
-    
+//     void check_joystick() {
+//     static GamePad gamepad;
+//     static bool initialized = false;
+//     static uint16_t lastState = 0; // Guarda el estado anterior
+//     static uint32_t debounceTimes[16] = {0}; // Array para almacenar los tiempos de debounce de cada botón
+//     static uint32_t last_button_check = 0;  // Última verificación para el debounce global
+
+//     // Inicialización del GamePad
+//     if (!initialized) {
+//         GamePad_init(&gamepad, 7, 2, 3, 4, 5, 6, 8);
+//         initialized = true;
+//     }
+
+//     uint16_t currentState = GamePad_getState(&gamepad);
+//     uint32_t currentMillis = time_us_32();  // Obtener el tiempo actual en microsegundos
+
+//     // Definimos el tiempo de debounce (50 ms = 50000 microsegundos)
+//     #define DEBOUNCE_DELAY 50000  // 50 ms en microsegundos
+
+//     // Lista de scancodes y las acciones que corresponden
+//     uint16_t buttonScancodes[] = {SC_BTN_UP, SC_BTN_DOWN, SC_BTN_LEFT, SC_BTN_RIGHT, 
+//                                   SC_BTN_START, SC_BTN_A, SC_BTN_B, SC_BTN_C, 
+//                                   SC_BTN_X, SC_BTN_Y, SC_BTN_Z, SC_BTN_1, 
+//                                   SC_BTN_2, SC_BTN_MODE};
+
+//     uint8_t joyActions[] = {ESP_JOY1UP, ESP_JOY1DOWN, ESP_JOY1LEFT, ESP_JOY1RIGHT, 
+//                             ESP_JOY1START, ESP_JOY1A, ESP_JOY1B, ESP_JOY1C, 
+//                             ESP_JOY1X, ESP_JOY1Y, ESP_JOY1Z, ESP_JOY1A, 
+//                             ESP_JOY1Z, ESP_JOY1MODE};
+
+//     // Procesamos cada botón en el array
+//     for (int i = 0; i < sizeof(buttonScancodes) / sizeof(buttonScancodes[0]); i++) {
+//         // Si el estado del botón cambió
+//         if ((currentState & buttonScancodes[i]) != (lastState & buttonScancodes[i])) {
+//             // Si ha pasado el tiempo de debounce, se procesa el botón
+//             if (currentMillis - debounceTimes[i] >= DEBOUNCE_DELAY) {
+//                 // Si el botón está presionado, enviamos el scancode de presionar
+//                 if (currentState & buttonScancodes[i]) {
+//                     send_joy_action(joyActions[i], true);
+//                 } else {
+//                     send_joy_action(joyActions[i], false);
+//                 }
+//                 debounceTimes[i] = currentMillis; // Actualizar el tiempo de debounce del botón
+//             }
+//         }
+//     }
+
+//     // Configuración de un control de debounce general para todos los botones
+//     if (currentMillis - last_button_check >= DEBOUNCE_DELAY) {
+//         last_button_check = currentMillis; // Actualiza la última verificación
+//     }
+
+//     // Actualizamos el estado anterior para el próximo ciclo
+//     lastState = currentState;
+// }
     
     
     
