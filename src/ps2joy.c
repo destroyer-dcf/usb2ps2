@@ -188,214 +188,155 @@ void send_joy_action(u8 scancode, bool press) {
 
 
 
-static uint32_t milliseconds = 0;
+// static uint32_t milliseconds = 0;
 
-// Función callback que se ejecuta cada milisegundo
-// Cambiar la firma para que coincida con alarm_callback_t
-int64_t timer_callback(int64_t alarm_time, void *user_data) {
-    milliseconds++;  // Incrementa cada vez que el temporizador se desborda (1ms)
-    return 0;  // Retorna 0 para indicar que el temporizador no se repite
-}
+// // Función callback que se ejecuta cada milisegundo
+// // Cambiar la firma para que coincida con alarm_callback_t
+// int64_t timer_callback(int64_t alarm_time, void *user_data) {
+//     milliseconds++;  // Incrementa cada vez que el temporizador se desborda (1ms)
+//     return 0;  // Retorna 0 para indicar que el temporizador no se repite
+// }
 
-// Función para inicializar el temporizador
-void setup_timer() {
-    // Configura el temporizador para que se ejecute cada milisegundo
-    add_alarm_in_ms(1, timer_callback, NULL, true);  // Llama a 'timer_callback' cada 1ms
-}
+// // Función para inicializar el temporizador
+// void setup_timer() {
+//     // Configura el temporizador para que se ejecute cada milisegundo
+//     add_alarm_in_ms(1, timer_callback, NULL, true);  // Llama a 'timer_callback' cada 1ms
+// }
 
-// Función millis() para obtener el tiempo transcurrido en milisegundos
-uint32_t millis() {
-    return milliseconds;
-}
+// // Función millis() para obtener el tiempo transcurrido en milisegundos
+// uint32_t millis() {
+//     return milliseconds;
+// }
 
 void check_joystick() {
-    static GamePad gamepad;
-    static bool initialized = false;
-    static uint16_t lastState = 0; // Declara lastState para almacenar el estado anterior
-    static uint32_t lastDebounceTime = 0;  // Almacena el tiempo del último rebote
 
-    // Inicializa el GamePad solo una vez
-    if (!initialized) {
-        GamePad_init(&gamepad, GAMEPAD_SELECT, GAMEPAD_UP, GAMEPAD_DOWN, GAMEPAD_LEFT, GAMEPAD_RIGHT, GAMEPAD_FIRE, 8);
-        initialized = true;
-    }
 
     uint16_t currentState = GamePad_getState(&gamepad);
 
     // Verificar el cambio de estado para cada botón, evitando el rebote
-    uint32_t currentMillis = millis();
+    // uint32_t currentMillis = millis();
     
-    // SC_BTN_UP
-    if ((currentState & SC_BTN_UP) != (lastState & SC_BTN_UP)) {
-        if (currentMillis - lastDebounceTime > SLEEP_TIME) {  // 50ms de debounce
+    // SC_BTN_UP    
+    if (currentState != lastState)
+    {
+        // Verificar el cambio de estado para cada botón
+        if ((currentState & SC_BTN_UP) != (lastState & SC_BTN_UP)) {
             if (currentState & SC_BTN_UP) {
                 send_joy_action(ESP_JOY1UP, true);
             } else {
                 send_joy_action(ESP_JOY1UP, false);
             }
-            lastDebounceTime = currentMillis;
         }
-    }
 
-    // SC_BTN_DOWN
-    if ((currentState & SC_BTN_DOWN) != (lastState & SC_BTN_DOWN)) {
-        if (currentMillis - lastDebounceTime > SLEEP_TIME) {
+        if ((currentState & SC_BTN_DOWN) != (lastState & SC_BTN_DOWN)) {
             if (currentState & SC_BTN_DOWN) {
                 send_joy_action(ESP_JOY1DOWN, true);
             } else {
                 send_joy_action(ESP_JOY1DOWN, false);
             }
-            lastDebounceTime = currentMillis;
         }
-    }
 
-    // SC_BTN_LEFT
-    if ((currentState & SC_BTN_LEFT) != (lastState & SC_BTN_LEFT)) {
-        if (currentMillis - lastDebounceTime > SLEEP_TIME) {
+        if ((currentState & SC_BTN_LEFT) != (lastState & SC_BTN_LEFT)) {
             if (currentState & SC_BTN_LEFT) {
                 send_joy_action(ESP_JOY1LEFT, true);
             } else {
                 send_joy_action(ESP_JOY1LEFT, false);
             }
-            lastDebounceTime = currentMillis;
         }
-    }
 
-    // SC_BTN_RIGHT
-    if ((currentState & SC_BTN_RIGHT) != (lastState & SC_BTN_RIGHT)) {
-        if (currentMillis - lastDebounceTime > SLEEP_TIME) {
+        if ((currentState & SC_BTN_RIGHT) != (lastState & SC_BTN_RIGHT)) {
             if (currentState & SC_BTN_RIGHT) {
                 send_joy_action(ESP_JOY1RIGHT, true);
             } else {
                 send_joy_action(ESP_JOY1RIGHT, false);
             }
-            lastDebounceTime = currentMillis;
         }
-    }
 
-    // SC_BTN_START
-    if ((currentState & SC_BTN_START) != (lastState & SC_BTN_START)) {
-        if (currentMillis - lastDebounceTime > SLEEP_TIME) {
+        if ((currentState & SC_BTN_START) != (lastState & SC_BTN_START)) {
             if (currentState & SC_BTN_START) {
                 send_joy_action(ESP_JOY1START, true);
             } else {
                 send_joy_action(ESP_JOY1START, false);
             }
-            lastDebounceTime = currentMillis;
         }
-    }
 
-    // SC_BTN_A
-    if ((currentState & SC_BTN_A) != (lastState & SC_BTN_A)) {
-        if (currentMillis - lastDebounceTime > SLEEP_TIME) {
+        if ((currentState & SC_BTN_A) != (lastState & SC_BTN_A)) {
             if (currentState & SC_BTN_A) {
                 send_joy_action(ESP_JOY1A, true);
             } else {
                 send_joy_action(ESP_JOY1A, false);
             }
-            lastDebounceTime = currentMillis;
         }
-    }
 
-    // SC_BTN_B
-    if ((currentState & SC_BTN_B) != (lastState & SC_BTN_B)) {
-        if (currentMillis - lastDebounceTime > SLEEP_TIME) {
+        if ((currentState & SC_BTN_B) != (lastState & SC_BTN_B)) {
             if (currentState & SC_BTN_B) {
                 send_joy_action(ESP_JOY1B, true);
             } else {
                 send_joy_action(ESP_JOY1B, false);
             }
-            lastDebounceTime = currentMillis;
         }
-    }
 
-    // SC_BTN_C
-    if ((currentState & SC_BTN_C) != (lastState & SC_BTN_C)) {
-        if (currentMillis - lastDebounceTime > SLEEP_TIME) {
+        if ((currentState & SC_BTN_C) != (lastState & SC_BTN_C)) {
             if (currentState & SC_BTN_C) {
                 send_joy_action(ESP_JOY1C, true);
             } else {
                 send_joy_action(ESP_JOY1C, false);
             }
-            lastDebounceTime = currentMillis;
         }
-    }
 
-    // SC_BTN_X
-    if ((currentState & SC_BTN_X) != (lastState & SC_BTN_X)) {
-        if (currentMillis - lastDebounceTime > SLEEP_TIME) {
+        if ((currentState & SC_BTN_X) != (lastState & SC_BTN_X)) {
             if (currentState & SC_BTN_X) {
                 send_joy_action(ESP_JOY1X, true);
             } else {
                 send_joy_action(ESP_JOY1X, false);
             }
-            lastDebounceTime = currentMillis;
         }
-    }
 
-    // SC_BTN_Y
-    if ((currentState & SC_BTN_Y) != (lastState & SC_BTN_Y)) {
-        if (currentMillis - lastDebounceTime > 50) {
+        if ((currentState & SC_BTN_Y) != (lastState & SC_BTN_Y)) {
             if (currentState & SC_BTN_Y) {
                 send_joy_action(ESP_JOY1Y, true);
             } else {
                 send_joy_action(ESP_JOY1Y, false);
             }
-            lastDebounceTime = currentMillis;
         }
-    }
 
-    // SC_BTN_Z
-    if ((currentState & SC_BTN_Z) != (lastState & SC_BTN_Z)) {
-        if (currentMillis - lastDebounceTime > 25) {
+        if ((currentState & SC_BTN_Z) != (lastState & SC_BTN_Z)) {
             if (currentState & SC_BTN_Z) {
                 send_joy_action(ESP_JOY1Z, true);
             } else {
                 send_joy_action(ESP_JOY1Z, false);
             }
-            lastDebounceTime = currentMillis;
         }
-    }
 
-    // SC_BTN_1
-    if ((currentState & SC_BTN_1) != (lastState & SC_BTN_1)) {
-        if (currentMillis - lastDebounceTime > 25) {
+        if ((currentState & SC_BTN_1) != (lastState & SC_BTN_1)) {
             if (currentState & SC_BTN_1) {
                 send_joy_action(ESP_JOY1A, true);
             } else {
                 send_joy_action(ESP_JOY1A, false);
             }
-            lastDebounceTime = currentMillis;
         }
-    }
 
-    // SC_BTN_2
-    if ((currentState & SC_BTN_2) != (lastState & SC_BTN_2)) {
-        if (currentMillis - lastDebounceTime > 50) {
+        if ((currentState & SC_BTN_2) != (lastState & SC_BTN_2)) {
             if (currentState & SC_BTN_2) {
                 send_joy_action(ESP_JOY1Z, true);
             } else {
                 send_joy_action(ESP_JOY1Z, false);
             }
-            lastDebounceTime = currentMillis;
         }
-    }
 
-    // SC_BTN_MODE
-    if ((currentState & SC_BTN_MODE) != (lastState & SC_BTN_MODE)) {
-        if (currentMillis - lastDebounceTime > 50) {
+        if ((currentState & SC_BTN_MODE) != (lastState & SC_BTN_MODE)) {
             if (currentState & SC_BTN_MODE) {
                 send_joy_action(ESP_JOY1MODE, true);
             } else {
                 send_joy_action(ESP_JOY1MODE, false);
             }
-            lastDebounceTime = currentMillis;
         }
+
+        lastState = currentState;
     }
-
-    lastState = currentState;  // Actualiza el estado anterior
-
-    // // Configuración del botón de prueba
+}
+    
+        // // Configuración del botón de prueba
     // bool current_state = !gpio_get(BUTTON_TESTING);
     // static bool button_pressed = false;
 
@@ -406,9 +347,6 @@ void check_joystick() {
     //     button_pressed = false;
     //     send_joy_action(ESP_JOY1LEFT, false);
     // }
-}
-    
-    
     
 //     void check_joystick() {
 //     static GamePad gamepad;

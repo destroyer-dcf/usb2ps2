@@ -50,7 +50,10 @@ void ms_init(u8 gpio_out, u8 gpio_in);
 void ms_usb_receive(u8 const* report);
 bool ms_task();
 
-// ADD -> DESTROYER
-void setup_timer();
-void check_joystick();
+
+
+typedef uint8_t u8;
+extern bool button_pressed;
+void kb_send(u8 scancode); // Declaración de kb_send
+
 // END - DESTROYER
