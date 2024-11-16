@@ -300,11 +300,7 @@ void check_joystick(GamePad* gamepad) {
     currentState = GamePad_getState(gamepad);
 
     // Verificar el cambio de estado para cada botón, evitando el rebote
-    // uint32_t currentMillis = millis();
-    
-    // SC_BTN_UP    
-    if (currentState != lastState)
-    {
+    if (currentState != lastState) {
         // Verificar el cambio de estado para cada botón
         if ((currentState & SC_BTN_UP) != (lastState & SC_BTN_UP)) {
             if (currentState & SC_BTN_UP) {
@@ -418,6 +414,7 @@ void check_joystick(GamePad* gamepad) {
             }
         }
 
+        // Actualiza el estado anterior después de procesar el cambio
         lastState = currentState;
     }
 }
