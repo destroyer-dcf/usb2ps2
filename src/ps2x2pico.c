@@ -37,17 +37,9 @@ static void print_utf16(uint16_t *temp_buf, size_t buf_len);
 void print_device_descriptor(tuh_xfer_t* xfer);
 
 //######################################################################################################################
-uint32_t last_button_check = 0;  // Última vez que se verificó el botón
+// Definición de la estructura GamePad
 static uint16_t lastState = 0; // Declara lastState para almacenar el estado anterior
 static uint16_t currentState = 0; // Declara lastState para almacenar el estado anterior
-
-// Prototipos de funciones
-void GamePad_init(GamePad* gamepad, uint db9_pin_7, uint db9_pin_1, uint db9_pin_2, uint db9_pin_3, uint db9_pin_4, uint db9_pin_6, uint db9_pin_9);
-uint16_t GamePad_getState(GamePad* gamepad);
-void send_joy_action(u8 scancode, bool press);
-void check_joystick(GamePad* gamepad);
-
-
 #define SLEEP_TIME 25
 #define GAMEPAD_SELECT 7
 #define GAMEPAD_UP 2 
@@ -71,39 +63,6 @@ void check_joystick(GamePad* gamepad);
 #define ESP_JOY1X 0x49
 #define ESP_JOY1Y 0x4a
 #define ESP_JOY1Z 0x4b
-
-// Definición de constantes y enumeraciones para el estado de los botones
-typedef enum {
-    SC_CTL_ON    = 1,    // El controlador está conectado
-    SC_BTN_UP    = 2,
-    SC_BTN_DOWN  = 4,
-    SC_BTN_LEFT  = 8,
-    SC_BTN_RIGHT = 16,
-    SC_BTN_START = 32,
-    SC_BTN_A     = 64,
-    SC_BTN_B     = 128,
-    SC_BTN_C     = 256,
-    SC_BTN_X     = 512,
-    SC_BTN_Y     = 1024,
-    SC_BTN_Z     = 2048,
-    SC_BTN_MODE  = 4096,
-    SC_BTN_1     = 128,  // Compatibilidad con Master System
-    SC_BTN_2     = 256   // Compatibilidad con Master System
-};
-
-// Definiciones para la configuración de pines y ciclos
-#define SC_INPUT_PINS 6
-#define SC_CYCLES 8
-#define SC_READ_DELAY_MS 5 // Debe ser >= 3 para dar tiempo a que se reinicie el controlador de 6 botones
-
-// Definición de la estructura GamePad
-typedef struct {
-    uint _selectPin;                // Pin de selección de salida
-    uint _inputPins[SC_INPUT_PINS]; // Array de pines de entrada
-    uint16_t _currentState;         // Estado actual de los botones
-    uint32_t _lastReadTime;         // Última vez que se leyó el estado
-    bool _sixButtonMode;            // Modo de seis botones activado/desactivado
-} GamePad;
 
 //######################################################################################################################
 
@@ -338,10 +297,7 @@ void send_joy_action(u8 scancode, bool press) {
 }
 
 void check_joystick(GamePad* gamepad) {
-    uint16_t currentState = GamePad_getState(gamepad);
-
-
-    uint16_t currentState = GamePad_getState(&gamepad);
+    currentState = GamePad_getState(gamepad);
 
     // Verificar el cambio de estado para cada botón, evitando el rebote
     // uint32_t currentMillis = millis();
@@ -494,7 +450,7 @@ void main() {
   GamePad_init(&gamepad, GAMEPAD_SELECT, GAMEPAD_UP, GAMEPAD_DOWN, GAMEPAD_LEFT, GAMEPAD_RIGHT, GAMEPAD_FIRE, 8);
 
     while (1) {
-        check_joystick();
+        check_joystick(&gamepad);
         tuh_task();
         kb_task();
         ms_task();
