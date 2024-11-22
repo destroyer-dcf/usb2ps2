@@ -51,24 +51,6 @@ static uint16_t currentState = 0; // Declara lastState para almacenar el estado 
 #define SCAN_CODE_SET_F0 0xf0
 #define SCAN_CODE_SET_E2 0xe2
 
-#define GAMEPAD_UP    2
-#define GAMEPAD_DOWN  3
-#define GAMEPAD_LEFT  4
-#define GAMEPAD_RIGHT 5
-#define GAMEPAD_FIRE  6
-
-// Estados de botones
-bool button_states[5] = {false, false, false, false, false}; // Estado actual (presionado o no)
-
-// Índices de los botones
-enum ButtonIndex {
-    UP = 0,
-    DOWN,
-    LEFT,
-    RIGHT,
-    FIRE
-};
-
 #define ESP_JOY1LEFT 0x40
 #define ESP_JOY1RIGHT 0x41
 #define ESP_JOY1UP 0x42
@@ -383,7 +365,6 @@ void check_joystick(GamePad* gamepad) {
     }
 }
 
-uint32_t last_button_check = 0;  // Última vez que se verificó el botón
 
 void main() {
   board_init();
@@ -408,124 +389,14 @@ void main() {
   kb_init(KBOUT, KBIN);
   ms_init(MSOUT, MSIN);
   
-//   static GamePad gamepad;
-//   GamePad_init(&gamepad, GAMEPAD_SELECT, GAMEPAD_UP, GAMEPAD_DOWN, GAMEPAD_LEFT, GAMEPAD_RIGHT, GAMEPAD_FIRE, 8);
-
-    // Configurar GPIOs
-    const uint BUTTON_PINS[] = {GAMEPAD_UP, GAMEPAD_DOWN, GAMEPAD_LEFT, GAMEPAD_RIGHT, GAMEPAD_FIRE};
-    const int NUM_BUTTONS = sizeof(BUTTON_PINS) / sizeof(BUTTON_PINS[0]);
-
-    for (int i = 0; i < NUM_BUTTONS; i++) {
-        gpio_init(BUTTON_PINS[i]);
-        gpio_set_dir(BUTTON_PINS[i], GPIO_IN);
-        gpio_pull_up(BUTTON_PINS[i]);
-    }
-    //     kb_send_key(0x52, 0, 0); // 0x52 cursor arriba
-    //     printf("Joy1Up release\n");
-    // break;
-    // case joy1Down:
-    //     kb_send_key(0x51, 0, 0); // 0x51 cursor abajo
-    //     printf("Joy1Down release\n");
-    // break;
-    // case joy1Left:
-    //     kb_send_key(0x50, 0, 0); //0x50 cursor izquierda
-    //     printf("Joy1Left release\n");
-    // break;
-    // case joy1Right:
-    //     kb_send_key(0x4f, 0, 0); //0x4f cursor derecha
-    //     printf("Joy1Right release\n");
-    // break;
-    // case joy1Fire: 
-    //     kb_send_key(0x2b, 0, 0); // tabulador
-        printf("Joy1Fire release \n");
+  static GamePad gamepad;
+  GamePad_init(&gamepad, GAMEPAD_SELECT, GAMEPAD_UP, GAMEPAD_DOWN, GAMEPAD_LEFT, GAMEPAD_RIGHT, GAMEPAD_FIRE, 8);
 
     while (1) {
-        // check_joystick(&gamepad);
-
+        check_joystick(&gamepad);
         tuh_task();
         kb_task();
         ms_task();
-        // // Configuración del botón de prueba0
-    bool current_state_up = !gpio_get(GAMEPAD_UP);
-    static bool button_pressed_up = false;
-
-    if (current_state_up && !button_pressed_up) {
-        button_pressed_up = true;
-        send_joy_action(ESP_JOY1UP, true);
-    } else if (!current_state_up && button_pressed_up) {
-        button_pressed_up = false;
-        send_joy_action(ESP_JOY1UP, false);
-    }
-
-    bool current_state_left = !gpio_get(GAMEPAD_LEFT);
-    static bool button_pressed_left = false;
-
-    if (current_state_left && !button_pressed_left) {
-        button_pressed_left = true;
-        send_joy_action(ESP_JOY1LEFT, true);
-    } else if (!current_state_left && button_pressed_left) {
-        button_pressed_left = false;
-        send_joy_action(ESP_JOY1LEFT, false);
-    }
-        // for (int i = 0; i < NUM_BUTTONS; i++) {
-        //     bool pressed = !gpio_get(BUTTON_PINS[i]); // Leer estado actual (invertido por pull-up)
-            
-        //     if (pressed && !button_states[i]) {
-        //         // Cambio de NO presionado a presionado
-        //         button_states[i] = true;
-        //         on_button_press(i);
-        //     } else if (!pressed && button_states[i]) {
-        //         // Cambio de presionado a NO presionado
-        //         button_states[i] = false;
-        //         on_button_release(i);
-        //     }
-        // }
-        // sleep_ms(10); // Retraso pequeño para evitar sobrecarga
-
-
-    }
-}
-
-
-// Función para manejar la acción al presionar un botón
-void on_button_press(uint button) {
-    switch (button) {
-        case UP:
-            send_joy_action(ESP_JOY1UP, true);
-            break;
-        case DOWN:
-            send_joy_action(ESP_JOY1DOWN, true);
-            break;
-        case LEFT:
-            send_joy_action(ESP_JOY1LEFT, true);
-            break;
-        case RIGHT:
-            send_joy_action(ESP_JOY1RIGHT, true);
-            break;
-        case FIRE:
-            send_joy_action(ESP_JOY1A, true);
-            break;
-    }
-}
-
-// Función para manejar la acción al soltar un botón
-void on_button_release(uint button) {
-    switch (button) {
-        case UP:
-            send_joy_action(ESP_JOY1UP, false);
-            break;
-        case DOWN:
-            send_joy_action(ESP_JOY1DOWN, false);
-            break;
-        case LEFT:
-            send_joy_action(ESP_JOY1LEFT, false);
-            break;
-        case RIGHT:
-            send_joy_action(ESP_JOY1RIGHT, false);
-            break;
-        case FIRE:
-            send_joy_action(ESP_JOY1A, false);
-            break;
     }
 }
 

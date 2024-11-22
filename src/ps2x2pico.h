@@ -102,5 +102,6 @@ void check_joystick(GamePad* gamepad);
 typedef uint8_t u8;
 extern bool button_pressed;
 void kb_send(u8 scancode); // Declaración de kb_send
-
+void on_button_press(uint button);
+void on_button_release(uint button);
 // END - DESTROYER
