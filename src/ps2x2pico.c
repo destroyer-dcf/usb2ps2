@@ -342,19 +342,23 @@ void check_joystick(GamePad* gamepad) {
     if (currentState != lastState) {
         // Verificar el cambio de estado para cada botón
         if ((currentState & SC_BTN_UP) != (lastState & SC_BTN_UP)) {
-            send_joy_action(ESP_JOY1UP, (currentState & SC_BTN_UP) != 0);
+            // send_joy_action(ESP_JOY1UP, (currentState & SC_BTN_UP) != 0);
+            kb_send_key_gamepad_control(2,(currentState & SC_BTN_UP) != 0)
         }
 
         if ((currentState & SC_BTN_DOWN) != (lastState & SC_BTN_DOWN)) {
-            send_joy_action(ESP_JOY1DOWN, (currentState & SC_BTN_DOWN) != 0);
+            //send_joy_action(ESP_JOY1DOWN, (currentState & SC_BTN_DOWN) != 0);
+            kb_send_key_gamepad_control(3,(currentState & SC_BTN_DOWN) != 0);
         }
 
         if ((currentState & SC_BTN_LEFT) != (lastState & SC_BTN_LEFT)) {
-            send_joy_action(ESP_JOY1LEFT, (currentState & SC_BTN_LEFT) != 0);
+            //send_joy_action(ESP_JOY1LEFT, (currentState & SC_BTN_LEFT) != 0);
+            kb_send_key_gamepad_control(0,(currentState & SC_BTN_LEFT) != 0);
         }
 
         if ((currentState & SC_BTN_RIGHT) != (lastState & SC_BTN_RIGHT)) {
-            send_joy_action(ESP_JOY1RIGHT, (currentState & SC_BTN_RIGHT) != 0);
+            // send_joy_action(ESP_JOY1RIGHT, (currentState & SC_BTN_RIGHT) != 0);
+            kb_send_key_gamepad_control(1, (currentState & SC_BTN_RIGHT) != 0);
         }
 
         if ((currentState & SC_BTN_START) != (lastState & SC_BTN_START)) {
@@ -362,7 +366,9 @@ void check_joystick(GamePad* gamepad) {
         }
 
         if ((currentState & SC_BTN_A) != (lastState & SC_BTN_A)) {
-            send_joy_action(ESP_JOY1A, (currentState & SC_BTN_A) != 0);
+            // send_joy_action(ESP_JOY1A, (currentState & SC_BTN_A) != 0);
+            printf("paso por aqui\n")
+            kb_send_key_gamepad_control(6, (currentState & SC_BTN_A) != 0);
         }
 
         if ((currentState & SC_BTN_B) != (lastState & SC_BTN_B)) {
@@ -412,7 +418,7 @@ void main() {
   gpio_init(LVIN);
 
   // ADD - DESTROYER
-  printf("Waiting for ESPectrum...\n");
+  printf("joystick 1.0...\n");
   gpio_init(BUTTON_TESTING);
   gpio_set_dir(BUTTON_TESTING, GPIO_IN);
   gpio_pull_up(BUTTON_TESTING);  // Habilita resistencia pull-up interna
