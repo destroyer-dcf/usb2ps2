@@ -342,55 +342,26 @@ void kb_send_key_scs3(u8 key, bool is_key_pressed) {
 // ************************
 // GAMEPAD CONTROL
 // ************************
+#define SCAN_CODE_SET_F0 0xf0
+#define SCAN_CODE_SET_E2 0xe2
+
 void kb_send_key_gamepad_control(u8 key, bool is_key_pressed) {
   printf("***** GAMEPAD CONTROL\n");
   printf("----> KEY VALUE: %u\n", key);
-
-  // u8 scan_code = IS_MOD_KEY(key) ? mod2ps2_3[key - HID_KEY_CONTROL_LEFT] : hid2ps2_3[key];
   u8 scan_code = gamepad_scancodes[key];
-  kb_send(KB_EXT_PFX_E0);
-  // if (!scan_code) {
-  //   printf("error \n");
-  //   LOG_UNMAPPED_KEY
-  //   return;
-  // }
-  kb_maybe_send_prefix(key);    
+  kb_send(SCAN_CODE_SET_E2);   
   if (is_key_pressed) {
-  // keyboard.write(0xE2);
-  // delay(25);
-  // if (!press) {
-  //   keyboard.write(0xF0);
-  //   delay(25);
-  // }
-  // keyboard.write(scancode);
-
-  // #define KB_EXT_PFX_E0 0xe0 
-    // Take care of typematic repeat
     printf("----> KEY PRESET: TRUE\n");
-    // if (
-    //   (scs3_mode == SCS3_MODE_MAKE_BREAK_TYPEMATIC || scs3_mode == SCS3_MODE_MAKE_TYPEMATIC)
-    //   && !(scs3keymodemap[scan_code] & KEYMODEMASK_TYPEMATIC)
-    // ) {
-    //   key2repeat = key;
-    //   if(repeater) cancel_alarm(repeater);
-    //   repeater = add_alarm_in_ms(delay_ms, repeat_cb, NULL, false);
-    // }
-    // printf ("3-> ", scan_code);
-
-      kb_send(scan_code);
+    key2repeat = key;
+    if(repeater) cancel_alarm(repeater);
+    repeater = add_alarm_in_ms(delay_ms, repeat_cb, NULL, false);
+    kb_send(scan_code);
   } else {
     printf("----> KEY PRESET: FALSE\n");
     if(key == key2repeat) key2repeat = 0;
-
-    // if (
-    //   (scs3_mode == SCS3_MODE_MAKE_BREAK || scs3_mode == SCS3_MODE_MAKE_BREAK_TYPEMATIC)
-    //   && !(scs3keymodemap[scan_code] & KEYMODEMASK_BREAK)
-    // ) {
-    //   // printf("4--> %d\n", scan_code);
-      kb_send(KB_BREAK_2_3);
-      kb_send(scan_code);
-    // }
+    kb_send(KB_BREAK_2_3);
   }
+  kb_send(scan_code);
 }
 
 

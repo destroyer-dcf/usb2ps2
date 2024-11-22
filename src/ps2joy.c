@@ -172,19 +172,19 @@ void GamePad_readCycle(GamePad* gamepad, int cycle) {
     }
 }
 
-void send_joy_action(u8 scancode, bool press) {
-    printf("***** KEYBOARD CONTROL\n");
-    kb_send(SCAN_CODE_SET_E2);
-    sleep_ms(SLEEP_TIME);
-    printf("----> KEY PRESSED: %s\n", press ? "TRUE" : "FALSE");
-    if (!press) {
-        kb_send(SCAN_CODE_SET_F0);
-        sleep_ms(SLEEP_TIME);
-    }
-    kb_send(scancode);
-    sleep_ms(SLEEP_TIME);
-    printf("**********************\n");
-}
+// void send_joy_action(u8 scancode, bool press) {
+//     printf("***** KEYBOARD CONTROL\n");
+//     kb_send(SCAN_CODE_SET_E2);
+//     sleep_ms(SLEEP_TIME);
+//     printf("----> KEY PRESSED: %s\n", press ? "TRUE" : "FALSE");
+//     if (!press) {
+//         kb_send(SCAN_CODE_SET_F0);
+//         sleep_ms(SLEEP_TIME);
+//     }
+//     kb_send(scancode);
+//     sleep_ms(SLEEP_TIME);
+//     printf("**********************\n");
+// }
 
 
 
