@@ -314,6 +314,25 @@ void send_joy_action(u8 scancode, bool press) {
     printf("**********************\n");
 }
 
+static uint32_t milliseconds = 0;
+
+// Función callback que se ejecuta cada milisegundo
+// Cambiar la firma para que coincida con alarm_callback_t
+int64_t timer_callback(int64_t alarm_time, void *user_data) {
+    milliseconds++;  // Incrementa cada vez que el temporizador se desborda (1ms)
+    return 0;  // Retorna 0 para indicar que el temporizador no se repite
+}
+
+// Función para inicializar el temporizador
+void setup_timer() {
+    // Configura el temporizador para que se ejecute cada milisegundo
+    add_alarm_in_ms(1, timer_callback, NULL, true);  // Llama a 'timer_callback' cada 1ms
+}
+
+// Función millis() para obtener el tiempo transcurrido en milisegundos
+uint32_t millis() {
+    return milliseconds;
+}
 
 
 void check_joystick(GamePad* gamepad) {
@@ -437,36 +456,43 @@ void main() {
     // break;
     // case joy1Fire: 
     //     kb_send_key(0x2b, 0, 0); // tabulador
-        printf("Joy1Fire release \n");
+        // printf("Joy1Fire release \n");
 
     while (1) {
         // check_joystick(&gamepad);
+        setup_timer();
+        // ADD -> DESTROYER
+        uint32_t current_time = time_us_32();  // Obtener tiempo actual en microsegundos
+        if (current_time - last_button_check >= DEBOUNCE_TIME * 1000) {
+            
+            bool current_state_up = !gpio_get(GAMEPAD_UP);
+            static bool button_pressed_up = false;
 
+            if (current_state_up && !button_pressed_up) {
+                button_pressed_up = true;
+                send_joy_action(ESP_JOY1UP, true);
+            } else if (!current_state_up && button_pressed_up) {
+                button_pressed_up = false;
+                send_joy_action(ESP_JOY1UP, false);
+            }
+
+            bool current_state_left = !gpio_get(GAMEPAD_LEFT);
+            static bool button_pressed_left = false;
+
+            if (current_state_left && !button_pressed_left) {
+                button_pressed_left = true;
+                send_joy_action(ESP_JOY1LEFT, true);
+            } else if (!current_state_left && button_pressed_left) {
+                button_pressed_left = false;
+                send_joy_action(ESP_JOY1LEFT, false);
+            }
+            last_button_check = current_time;  // Actualiza la última verificación
+        }
         tuh_task();
         kb_task();
         ms_task();
         // // Configuración del botón de prueba0
-    bool current_state_up = !gpio_get(GAMEPAD_UP);
-    static bool button_pressed_up = false;
 
-    if (current_state_up && !button_pressed_up) {
-        button_pressed_up = true;
-        send_joy_action(ESP_JOY1UP, true);
-    } else if (!current_state_up && button_pressed_up) {
-        button_pressed_up = false;
-        send_joy_action(ESP_JOY1UP, false);
-    }
-
-    bool current_state_left = !gpio_get(GAMEPAD_LEFT);
-    static bool button_pressed_left = false;
-
-    if (current_state_left && !button_pressed_left) {
-        button_pressed_left = true;
-        send_joy_action(ESP_JOY1LEFT, true);
-    } else if (!current_state_left && button_pressed_left) {
-        button_pressed_left = false;
-        send_joy_action(ESP_JOY1LEFT, false);
-    }
         // for (int i = 0; i < NUM_BUTTONS; i++) {
         //     bool pressed = !gpio_get(BUTTON_PINS[i]); // Leer estado actual (invertido por pull-up)
             
