@@ -33,6 +33,11 @@
 #include "bsp/board_api.h"
 #include "tusb.h"
 #include "ps2x2pico.h"
+#include "ps2pad.h"
+
+//DESTROYER
+uint32_t last_button_check = 0;  // Última vez que se verificó el botón
+
 
 static void print_utf16(uint16_t *temp_buf, size_t buf_len);
 void print_device_descriptor(tuh_xfer_t* xfer);
@@ -178,8 +183,16 @@ void main() {
   tusb_init();
   kb_init(KBOUT, KBIN);
   ms_init(MSOUT, MSIN);
-  
+
+    // END - DESTROYER
   while(1) {
+      // ADD -> DESTROYER
+    // uint32_t current_time = time_us_32();  // Obtener tiempo actual en microsegundos
+    // if (current_time - last_button_check >= DEBOUNCE_TIME * 1000) {
+        
+    //     padController(); 
+    //     last_button_check = current_time;  // Actualiza la última verificación
+    // }
     tuh_task();
     kb_task();
     ms_task();

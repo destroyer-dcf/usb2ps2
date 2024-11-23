@@ -30,6 +30,45 @@
 //#include "ps2phy.h"
 #include "class/hid/hid.h"
 
+u8 const gamepad_scancodes[] = {
+    0x40,  // LEFT 0
+    0x41,  // RIGHT 1
+    0x42,  // UP 2
+    0x43,  // DOWN 3
+    0x44,  // START 4
+    0x45,  // MODE 5
+    0x46,  // BUTTON_A 6
+    0x47,  // BUTTON_B 7
+    0x48,  // BUTTON_C 8
+    0x49,  // BUTTON_X 9
+    0x4A,  // BUTTON_Y 10
+    0x4B   // BUTTON_Z 11
+};
+      // ESP_JOY1LEFT = 0x40,
+      // ESP_JOY1RIGHT = 0x41,
+      // ESP_JOY1UP = 0x42,
+      // ESP_JOY1DOWN = 0x43,
+      // ESP_JOY1START = 0x44,
+      // ESP_JOY1MODE = 0x45,
+      // ESP_JOY1A = 0x46,
+      // ESP_JOY1B = 0x47,
+      // ESP_JOY1C = 0x48,
+      // ESP_JOY1X = 0x49,
+      // ESP_JOY1Y = 0x4a,
+      // ESP_JOY1Z = 0x4b,
+      // ESP_JOY2LEFT = 0x4c,
+      // ESP_JOY2RIGHT = 0x4d,
+      // ESP_JOY2UP = 0x4e,
+      // ESP_JOY2DOWN = 0x4f,
+      // ESP_JOY2START = 0x50,
+      // ESP_JOY2MODE = 0x51,
+      // ESP_JOY2A = 0x52,
+      // ESP_JOY2B = 0x53,
+      // ESP_JOY2C = 0x54,
+      // ESP_JOY2X = 0x55,
+      // ESP_JOY2Y = 0x56,
+      // ESP_JOY2Z = 0x57
+
 u8 const ext_code_keys_1_2[] = {
   HID_KEY_INSERT,
   HID_KEY_HOME,

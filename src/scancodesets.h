@@ -52,3 +52,4 @@ extern u8 const prt_scn_make_2[];
 extern u8 const prt_scn_break_2[];
 extern u8 const break_make_2[];
 extern u8 const pause_make_2[];
+extern u8 const gamepad_scancodes[];

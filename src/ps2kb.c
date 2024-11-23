@@ -310,6 +310,28 @@ void kb_send_key_scs3(u8 key, bool is_key_pressed) {
   }
 }
 
+#define SCAN_CODE_SET_F0 0xf0
+#define SCAN_CODE_SET_E2 0xe2
+
+void kb_send_key_gamepad_control(u8 key, bool is_key_pressed) {
+  printf("***** GAMEPAD CONTROL\n");
+  printf("----> KEY VALUE: %u\n", key);
+  u8 scan_code = gamepad_scancodes[key];
+  kb_send(SCAN_CODE_SET_E2);   
+  if (is_key_pressed) {
+    printf("----> KEY PRESET: TRUE\n");
+    key2repeat = key;
+    if(repeater) cancel_alarm(repeater);
+    repeater = add_alarm_in_ms(delay_ms, repeat_cb, NULL, false);
+    kb_send(scan_code);
+  } else {
+    printf("----> KEY PRESET: FALSE\n");
+    if(key == key2repeat) key2repeat = 0;
+    kb_send(KB_BREAK_2_3);
+  }
+  kb_send(scan_code);
+}
+
 // Sends a key state change to the host
 // u8 keycode          - from hid.h HID_KEY_ definition
 // bool is_key_pressed - state of key: true=pressed, false=released
