@@ -51,7 +51,8 @@ void ms_usb_receive(u8 const* report);
 bool ms_task();
 
 // ADD -> DESTROYER
-void setup_timer();
-void check_joystick();
-void send_joy_action(u8 scancode, bool press); // Actualiza la declaración
+void padController();
+// void setup_timer();
+// void check_joystick();
+// void send_joy_action(u8 scancode, bool press); // Actualiza la declaración
 // END - DESTROYER
