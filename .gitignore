@@ -6,4 +6,6 @@
 .*.swp
 pico-sdk/
 original/
-
+BKP/
+bkp/
+sendArtifact.sh1
