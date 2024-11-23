@@ -82,18 +82,18 @@ u8 const break_make_2[]    = { 0xe0, 0x7e, 0xe0, 0xf0, 0x7e, 0 };
 u8 const pause_make_2[]    = { 0xe1, 0x14, 0x77, 0xe1, 0xf0, 0x14, 0xf0, 0x77, 0 };
 
 u8 const gamepad_scancodes[] = {
-    0x40,  // LEFT
-    0x41,  // RIGHT
-    0x42,  // UP
-    0x43,  // DOWN
-    0x44,  // START
-    0x45,  // MODE
-    0x46,  // BUTTON_A
-    0x47,  // BUTTON_B
-    0x48,  // BUTTON_C
-    0x49,  // BUTTON_X
-    0x4A,  // BUTTON_Y
-    0x4B   // BUTTON_Z
+    0x40,  // LEFT 0
+    0x41,  // RIGHT 1
+    0x42,  // UP 2
+    0x43,  // DOWN 3
+    0x44,  // START 4
+    0x45,  // MODE 5
+    0x46,  // BUTTON_A 6
+    0x47,  // BUTTON_B 7
+    0x48,  // BUTTON_C 8
+    0x49,  // BUTTON_X 9
+    0x4A,  // BUTTON_Y 10
+    0x4B   // BUTTON_Z 11
 };
       // ESP_JOY1LEFT = 0x40,
       // ESP_JOY1RIGHT = 0x41,

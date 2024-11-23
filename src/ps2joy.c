@@ -81,95 +81,146 @@
 #define GAMEPAD_MODE 8 // Es mode???
 
 
-bool button_pressed = false;  
+// bool button_pressed = false;  
 
 
-// Inicializa el GamePad con los pines correspondientes
-void GamePad_init(GamePad* gamepad, uint db9_pin_7, uint db9_pin_1, uint db9_pin_2, uint db9_pin_3, uint db9_pin_4, uint db9_pin_6, uint db9_pin_9) {
-    gamepad->_selectPin = db9_pin_7;
+// // Inicializa el GamePad con los pines correspondientes
+// void GamePad_init(GamePad* gamepad, uint db9_pin_7, uint db9_pin_1, uint db9_pin_2, uint db9_pin_3, uint db9_pin_4, uint db9_pin_6, uint db9_pin_9) {
+//     gamepad->_selectPin = db9_pin_7;
 
-    gamepad->_inputPins[0] = db9_pin_1;
-    gamepad->_inputPins[1] = db9_pin_2;
-    gamepad->_inputPins[2] = db9_pin_3;
-    gamepad->_inputPins[3] = db9_pin_4;
-    gamepad->_inputPins[4] = db9_pin_6;
-    gamepad->_inputPins[5] = db9_pin_9;
+//     gamepad->_inputPins[0] = db9_pin_1;
+//     gamepad->_inputPins[1] = db9_pin_2;
+//     gamepad->_inputPins[2] = db9_pin_3;
+//     gamepad->_inputPins[3] = db9_pin_4;
+//     gamepad->_inputPins[4] = db9_pin_6;
+//     gamepad->_inputPins[5] = db9_pin_9;
 
-    gpio_init(gamepad->_selectPin);
-    gpio_set_dir(gamepad->_selectPin, GPIO_OUT);
-    gpio_put(gamepad->_selectPin, 1);
+//     gpio_init(gamepad->_selectPin);
+//     gpio_set_dir(gamepad->_selectPin, GPIO_OUT);
+//     gpio_put(gamepad->_selectPin, 1);
 
-    for (int i = 0; i < SC_INPUT_PINS; i++) {
-        gpio_init(gamepad->_inputPins[i]);
-        gpio_set_dir(gamepad->_inputPins[i], GPIO_IN);
-        gpio_pull_up(gamepad->_inputPins[i]);
-    }
+//     for (int i = 0; i < SC_INPUT_PINS; i++) {
+//         gpio_init(gamepad->_inputPins[i]);
+//         gpio_set_dir(gamepad->_inputPins[i], GPIO_IN);
+//         gpio_pull_up(gamepad->_inputPins[i]);
+//     }
 
-    gamepad->_currentState = 0;
-    gamepad->_sixButtonMode = false;
-    gamepad->_lastReadTime = to_ms_since_boot(get_absolute_time());
-}
+//     gamepad->_currentState = 0;
+//     gamepad->_sixButtonMode = false;
+//     gamepad->_lastReadTime = to_ms_since_boot(get_absolute_time());
+// }
 
-// Devuelve el estado actual de los botones
-uint16_t GamePad_getState(GamePad* gamepad) {
-    uint32_t currentTime = to_ms_since_boot(get_absolute_time());
+// // Devuelve el estado actual de los botones
+// uint16_t GamePad_getState(GamePad* gamepad) {
+//     uint32_t currentTime = to_ms_since_boot(get_absolute_time());
 
-    if ((currentTime - gamepad->_lastReadTime) < SC_READ_DELAY_MS) {
-        return gamepad->_currentState;
-    }
+//     if ((currentTime - gamepad->_lastReadTime) < SC_READ_DELAY_MS) {
+//         return gamepad->_currentState;
+//     }
 
-    uint32_t savedInterrupts = save_and_disable_interrupts();
-    gamepad->_currentState = 0;
+//     uint32_t savedInterrupts = save_and_disable_interrupts();
+//     gamepad->_currentState = 0;
 
-    for (int cycle = 0; cycle < SC_CYCLES; cycle++) {
-        GamePad_readCycle(gamepad, cycle);
-    }
+//     for (int cycle = 0; cycle < SC_CYCLES; cycle++) {
+//         GamePad_readCycle(gamepad, cycle);
+//     }
 
-    if (!(gamepad->_currentState & SC_CTL_ON)) {
-        gamepad->_sixButtonMode = false;
-    }
+//     if (!(gamepad->_currentState & SC_CTL_ON)) {
+//         gamepad->_sixButtonMode = false;
+//     }
 
-    restore_interrupts(savedInterrupts);
-    gamepad->_lastReadTime = currentTime;
-    return gamepad->_currentState;
-}
+//     restore_interrupts(savedInterrupts);
+//     gamepad->_lastReadTime = currentTime;
+//     return gamepad->_currentState;
+// }
 
-// Lee un ciclo específico para obtener el estado de los botones
-void GamePad_readCycle(GamePad* gamepad, int cycle) {
-    gpio_put(gamepad->_selectPin, cycle % 2);
+// // Lee un ciclo específico para obtener el estado de los botones
+// void GamePad_readCycle(GamePad* gamepad, int cycle) {
+//     gpio_put(gamepad->_selectPin, cycle % 2);
 
-    switch (cycle) {
-        case 2:
-            gamepad->_currentState |= (gpio_get(gamepad->_inputPins[2]) == 0 && gpio_get(gamepad->_inputPins[3]) == 0) * SC_CTL_ON;
+//     switch (cycle) {
+//         case 2:
+//             gamepad->_currentState |= (gpio_get(gamepad->_inputPins[2]) == 0 && gpio_get(gamepad->_inputPins[3]) == 0) * SC_CTL_ON;
             
-            if (gamepad->_currentState & SC_CTL_ON) {
-                if (gpio_get(gamepad->_inputPins[4]) == 0) { gamepad->_currentState |= SC_BTN_A; }
-                if (gpio_get(gamepad->_inputPins[5]) == 0) { gamepad->_currentState |= SC_BTN_START; }
-            }
-            break;
+//             if (gamepad->_currentState & SC_CTL_ON) {
+//                 if (gpio_get(gamepad->_inputPins[4]) == 0) { gamepad->_currentState |= SC_BTN_A; }
+//                 if (gpio_get(gamepad->_inputPins[5]) == 0) { gamepad->_currentState |= SC_BTN_START; }
+//             }
+//             break;
 
-        case 3:
-            if (gpio_get(gamepad->_inputPins[0]) == 0) { gamepad->_currentState |= SC_BTN_UP; }
-            if (gpio_get(gamepad->_inputPins[1]) == 0) { gamepad->_currentState |= SC_BTN_DOWN; }
-            if (gpio_get(gamepad->_inputPins[2]) == 0) { gamepad->_currentState |= SC_BTN_LEFT; }
-            if (gpio_get(gamepad->_inputPins[3]) == 0) { gamepad->_currentState |= SC_BTN_RIGHT; }
-            if (gpio_get(gamepad->_inputPins[4]) == 0) { gamepad->_currentState |= SC_BTN_B; }
-            if (gpio_get(gamepad->_inputPins[5]) == 0) { gamepad->_currentState |= SC_BTN_C; }
-            break;
+//         case 3:
+//             if (gpio_get(gamepad->_inputPins[0]) == 0) { gamepad->_currentState |= SC_BTN_UP; }
+//             if (gpio_get(gamepad->_inputPins[1]) == 0) { gamepad->_currentState |= SC_BTN_DOWN; }
+//             if (gpio_get(gamepad->_inputPins[2]) == 0) { gamepad->_currentState |= SC_BTN_LEFT; }
+//             if (gpio_get(gamepad->_inputPins[3]) == 0) { gamepad->_currentState |= SC_BTN_RIGHT; }
+//             if (gpio_get(gamepad->_inputPins[4]) == 0) { gamepad->_currentState |= SC_BTN_B; }
+//             if (gpio_get(gamepad->_inputPins[5]) == 0) { gamepad->_currentState |= SC_BTN_C; }
+//             break;
 
-        case 4:
-            gamepad->_sixButtonMode = (gpio_get(gamepad->_inputPins[0]) == 0 && gpio_get(gamepad->_inputPins[1]) == 0);
-            break;
+//         case 4:
+//             gamepad->_sixButtonMode = (gpio_get(gamepad->_inputPins[0]) == 0 && gpio_get(gamepad->_inputPins[1]) == 0);
+//             break;
 
-        case 5:
-            if (gamepad->_sixButtonMode) {
-                if (gpio_get(gamepad->_inputPins[0]) == 0) { gamepad->_currentState |= SC_BTN_Z; }
-                if (gpio_get(gamepad->_inputPins[1]) == 0) { gamepad->_currentState |= SC_BTN_Y; }
-                if (gpio_get(gamepad->_inputPins[2]) == 0) { gamepad->_currentState |= SC_BTN_X; }
-                if (gpio_get(gamepad->_inputPins[3]) == 0) { gamepad->_currentState |= SC_BTN_MODE; }
-            }
+//         case 5:
+//             if (gamepad->_sixButtonMode) {
+//                 if (gpio_get(gamepad->_inputPins[0]) == 0) { gamepad->_currentState |= SC_BTN_Z; }
+//                 if (gpio_get(gamepad->_inputPins[1]) == 0) { gamepad->_currentState |= SC_BTN_Y; }
+//                 if (gpio_get(gamepad->_inputPins[2]) == 0) { gamepad->_currentState |= SC_BTN_X; }
+//                 if (gpio_get(gamepad->_inputPins[3]) == 0) { gamepad->_currentState |= SC_BTN_MODE; }
+//             }
+//             break;
+//     }
+// }
+void onchange(button_t *button_p) {
+  button_t *button = (button_t*)button_p;
+//RELEASED
+  if(button->state) {
+    printf ("el state del pin %d es %d ¿Hemos SOLTADO el boton?\n",button->pin,button->state);
+    switch(button->pin){
+
+        case GAMEPAD_UP:
+            kb_send_key(0x52, 0, 0);
+            break;
+        case GAMEPAD_DOWN:
+            kb_send_key(0x51, 0, 0);
+            break;
+        case GAMEPAD_LEFT:
+            kb_send_key(0x50, 0, 0);
+            break;
+        case GAMEPAD_RIGHT:
+            kb_send_key(0x4f, 0, 0);
+            break;
+        case GAMEPAD_FIRE: 
+            kb_send_key(0x2b, 0, 0);
             break;
     }
+    
+    return;
+  }
+   
+   //PUSH
+   if(!button->state) {printf ("el state del pin %d es %d ¿Hemos pulsado el boton?\n",button->pin,button->state);
+   switch(button->pin){
+
+    case GAMEPAD_UP:
+        kb_send_key(0x52, 1, 0);
+        break;
+    case GAMEPAD_DOWN:
+        kb_send_key(0x51, 1, 0);
+        break;
+    case GAMEPAD_LEFT:
+        kb_send_key(0x50, 1, 0);
+        break;
+    case GAMEPAD_RIGHT:
+        kb_send_key(0x4f, 1, 0);
+        break;
+    case GAMEPAD_FIRE:
+        kb_send_key(0x2b, 1, 0);
+        break;
+  }
+   
+   return; }
+
 }
 
 void send_joy_action(u8 scancode, bool press) {
@@ -186,7 +237,13 @@ void send_joy_action(u8 scancode, bool press) {
     printf("**********************\n");
 }
 
-
+void GamePadController(){
+  button_t *Gamepad_UP = create_button(GAMEPAD_UP, onchange);
+  button_t *Gamepad_DOWN = create_button(GAMEPAD_DOWN, onchange);
+  button_t *Gamepad_LEFT = create_button(GAMEPAD_LEFT, onchange);
+  button_t *Gamepad_RIGHT = create_button(GAMEPAD_RIGHT, onchange);
+  button_t *Gamepad_FIRE = create_button(GAMEPAD_FIRE, onchange);
+}
 
 // static uint32_t milliseconds = 0;
 
@@ -208,133 +265,164 @@ void send_joy_action(u8 scancode, bool press) {
 //     return milliseconds;
 // }
 
-void check_joystick() {
+// void check_joystick() {
+//     // 0x40,  // LEFT 0
+//     // 0x41,  // RIGHT 1
+//     // 0x42,  // UP 2
+//     // 0x43,  // DOWN 3
+//     // 0x44,  // START 4
+//     // 0x45,  // MODE 5
+//     // 0x46,  // BUTTON_A 6
+//     // 0x47,  // BUTTON_B 7
+//     // 0x48,  // BUTTON_C 8
+//     // 0x49,  // BUTTON_X 9
+//     // 0x4A,  // BUTTON_Y 10
+//     // 0x4B   // BUTTON_Z 11
 
+//     uint16_t currentState = GamePad_getState(&gamepad);
 
-    uint16_t currentState = GamePad_getState(&gamepad);
-
-    // Verificar el cambio de estado para cada botón, evitando el rebote
-    // uint32_t currentMillis = millis();
+//     // Verificar el cambio de estado para cada botón, evitando el rebote
+//     // uint32_t currentMillis = millis();
     
-    // SC_BTN_UP    
-    if (currentState != lastState)
-    {
-        // Verificar el cambio de estado para cada botón
-        if ((currentState & SC_BTN_UP) != (lastState & SC_BTN_UP)) {
-            if (currentState & SC_BTN_UP) {
-                send_joy_action(ESP_JOY1UP, true);
-            } else {
-                send_joy_action(ESP_JOY1UP, false);
-            }
-        }
+//     // SC_BTN_UP    
+//     if (currentState != lastState)
+//     {
+//         // Verificar el cambio de estado para cada botón 
+//         if ((currentState & SC_BTN_UP) != (lastState & SC_BTN_UP)) {
+//             if (currentState & SC_BTN_UP) {
+//                 // send_joy_action(ESP_JOY1UP, true);
+//                 kb_send_key_gamepad_control(2, true);
+//             } else {
+//                 // send_joy_action(ESP_JOY1UP, false);
+//                 kb_send_key_gamepad_control(2, false);
+//             }
+//         }
 
-        if ((currentState & SC_BTN_DOWN) != (lastState & SC_BTN_DOWN)) {
-            if (currentState & SC_BTN_DOWN) {
-                send_joy_action(ESP_JOY1DOWN, true);
-            } else {
-                send_joy_action(ESP_JOY1DOWN, false);
-            }
-        }
+//         if ((currentState & SC_BTN_DOWN) != (lastState & SC_BTN_DOWN)) {
+//             if (currentState & SC_BTN_DOWN) {
+//                 // send_joy_action(ESP_JOY1DOWN, true);
+//                 kb_send_key_gamepad_control(3, true);
+//             } else {
+//                 //send_joy_action(ESP_JOY1DOWN, false);
+//                 kb_send_key_gamepad_control(3, false);
+//             }
+//         }
 
-        if ((currentState & SC_BTN_LEFT) != (lastState & SC_BTN_LEFT)) {
-            if (currentState & SC_BTN_LEFT) {
-                send_joy_action(ESP_JOY1LEFT, true);
-            } else {
-                send_joy_action(ESP_JOY1LEFT, false);
-            }
-        }
+//         if ((currentState & SC_BTN_LEFT) != (lastState & SC_BTN_LEFT)) {
+//             if (currentState & SC_BTN_LEFT) {
+//                 // send_joy_action(ESP_JOY1LEFT, true);
+//                 kb_send_key_gamepad_control(0, true);
+//             } else {
+//                 // send_joy_action(ESP_JOY1LEFT, false);
+//                 kb_send_key_gamepad_control(0, false);
+//             }
+//         }
 
-        if ((currentState & SC_BTN_RIGHT) != (lastState & SC_BTN_RIGHT)) {
-            if (currentState & SC_BTN_RIGHT) {
-                send_joy_action(ESP_JOY1RIGHT, true);
-            } else {
-                send_joy_action(ESP_JOY1RIGHT, false);
-            }
-        }
+//         if ((currentState & SC_BTN_RIGHT) != (lastState & SC_BTN_RIGHT)) {
+//             if (currentState & SC_BTN_RIGHT) {
+//                 // send_joy_action(ESP_JOY1RIGHT, true);
+//                 kb_send_key_gamepad_control(1, true);
+//             } else {
+//                 // send_joy_action(ESP_JOY1RIGHT, false);
+//                 kb_send_key_gamepad_control(1, false);
+//             }
+//         }
 
-        if ((currentState & SC_BTN_START) != (lastState & SC_BTN_START)) {
-            if (currentState & SC_BTN_START) {
-                send_joy_action(ESP_JOY1START, true);
-            } else {
-                send_joy_action(ESP_JOY1START, false);
-            }
-        }
+//         if ((currentState & SC_BTN_START) != (lastState & SC_BTN_START)) {
+//             if (currentState & SC_BTN_START) {
+//                 //send_joy_action(ESP_JOY1START, true);
+//                 kb_send_key_gamepad_control(4, true);
+//             } else {
+//                 // send_joy_action(ESP_JOY1START, false);
+//                 kb_send_key_gamepad_control(4, false);
+//             }
+//         }
 
-        if ((currentState & SC_BTN_A) != (lastState & SC_BTN_A)) {
-            if (currentState & SC_BTN_A) {
-                send_joy_action(ESP_JOY1A, true);
-            } else {
-                send_joy_action(ESP_JOY1A, false);
-            }
-        }
+//         if ((currentState & SC_BTN_A) != (lastState & SC_BTN_A)) {
+//             if (currentState & SC_BTN_A) {
+//                 // send_joy_action(ESP_JOY1A, true);
+//                 kb_send_key_gamepad_control(6, true);
+//             } else {
+//                 // send_joy_action(ESP_JOY1A, false);
+//                 kb_send_key_gamepad_control(6, false);
+//             }
+//         }
 
-        if ((currentState & SC_BTN_B) != (lastState & SC_BTN_B)) {
-            if (currentState & SC_BTN_B) {
-                send_joy_action(ESP_JOY1B, true);
-            } else {
-                send_joy_action(ESP_JOY1B, false);
-            }
-        }
+//         if ((currentState & SC_BTN_B) != (lastState & SC_BTN_B)) {
+//             if (currentState & SC_BTN_B) {
+//                 // send_joy_action(ESP_JOY1B, true);
+//                 kb_send_key_gamepad_control(7, true);
+//             } else {
+//                 // send_joy_action(ESP_JOY1B, false);
+//                 kb_send_key_gamepad_control(7, false);
+//             }
+//         }
 
-        if ((currentState & SC_BTN_C) != (lastState & SC_BTN_C)) {
-            if (currentState & SC_BTN_C) {
-                send_joy_action(ESP_JOY1C, true);
-            } else {
-                send_joy_action(ESP_JOY1C, false);
-            }
-        }
+//         if ((currentState & SC_BTN_C) != (lastState & SC_BTN_C)) {
+//             if (currentState & SC_BTN_C) {
+//                 //send_joy_action(ESP_JOY1C, true);
+//                 kb_send_key_gamepad_control(8, true);
+//             } else {
+//                 // send_joy_action(ESP_JOY1C, false);
+//                 kb_send_key_gamepad_control(8, false);
+//             }
+//         }
 
-        if ((currentState & SC_BTN_X) != (lastState & SC_BTN_X)) {
-            if (currentState & SC_BTN_X) {
-                send_joy_action(ESP_JOY1X, true);
-            } else {
-                send_joy_action(ESP_JOY1X, false);
-            }
-        }
+//         if ((currentState & SC_BTN_X) != (lastState & SC_BTN_X)) {
+//             if (currentState & SC_BTN_X) {
+//                 // send_joy_action(ESP_JOY1X, true);
+//                 kb_send_key_gamepad_control(9, true);
+//             } else {
+//                 // send_joy_action(ESP_JOY1X, false);
+//                 kb_send_key_gamepad_control(9, false);
+//             }
+//         }
 
-        if ((currentState & SC_BTN_Y) != (lastState & SC_BTN_Y)) {
-            if (currentState & SC_BTN_Y) {
-                send_joy_action(ESP_JOY1Y, true);
-            } else {
-                send_joy_action(ESP_JOY1Y, false);
-            }
-        }
+//         if ((currentState & SC_BTN_Y) != (lastState & SC_BTN_Y)) {
+//             if (currentState & SC_BTN_Y) {
+//                 // send_joy_action(ESP_JOY1Y, true);
+//                 kb_send_key_gamepad_control(10, true);
+//             } else {
+//                 // send_joy_action(ESP_JOY1Y, false);
+//                 kb_send_key_gamepad_control(11, false);
+//             }
+//         }
 
-        if ((currentState & SC_BTN_Z) != (lastState & SC_BTN_Z)) {
-            if (currentState & SC_BTN_Z) {
-                send_joy_action(ESP_JOY1Z, true);
-            } else {
-                send_joy_action(ESP_JOY1Z, false);
-            }
-        }
+//         if ((currentState & SC_BTN_Z) != (lastState & SC_BTN_Z)) {
+//             if (currentState & SC_BTN_Z) {
+//                 send_joy_action(ESP_JOY1Z, true);
+//             } else {
+//                 send_joy_action(ESP_JOY1Z, false);
+//             }
+//         }
 
-        if ((currentState & SC_BTN_1) != (lastState & SC_BTN_1)) {
-            if (currentState & SC_BTN_1) {
-                send_joy_action(ESP_JOY1A, true);
-            } else {
-                send_joy_action(ESP_JOY1A, false);
-            }
-        }
+//         if ((currentState & SC_BTN_1) != (lastState & SC_BTN_1)) {
+//             if (currentState & SC_BTN_1) {
+//                 send_joy_action(ESP_JOY1A, true);
+//             } else {
+//                 send_joy_action(ESP_JOY1A, false);
+//             }
+//         }
 
-        if ((currentState & SC_BTN_2) != (lastState & SC_BTN_2)) {
-            if (currentState & SC_BTN_2) {
-                send_joy_action(ESP_JOY1Z, true);
-            } else {
-                send_joy_action(ESP_JOY1Z, false);
-            }
-        }
+//         if ((currentState & SC_BTN_2) != (lastState & SC_BTN_2)) {
+//             if (currentState & SC_BTN_2) {
+//                 send_joy_action(ESP_JOY1Z, true);
+//             } else {
+//                 send_joy_action(ESP_JOY1Z, false);
+//             }
+//         }
 
-        if ((currentState & SC_BTN_MODE) != (lastState & SC_BTN_MODE)) {
-            if (currentState & SC_BTN_MODE) {
-                send_joy_action(ESP_JOY1MODE, true);
-            } else {
-                send_joy_action(ESP_JOY1MODE, false);
-            }
-        }
+//         if ((currentState & SC_BTN_MODE) != (lastState & SC_BTN_MODE)) {
+//             if (currentState & SC_BTN_MODE) {
+//                 send_joy_action(ESP_JOY1MODE, true);
+//             } else {
+//                 send_joy_action(ESP_JOY1MODE, false);
+//             }
+//         }
 
-        lastState = currentState;
-    }
-}
+//         lastState = currentState;
+//     }
+// }
     
         // // Configuración del botón de prueba
     // bool current_state = !gpio_get(BUTTON_TESTING);

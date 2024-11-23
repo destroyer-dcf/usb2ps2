@@ -32,6 +32,9 @@
 #include "bsp/board_api.h"
 #include "tusb.h"
 #include "ps2x2pico.h"
+#include "button.h"
+#include "gamepad.h"
+
 
 static void print_utf16(uint16_t *temp_buf, size_t buf_len);
 void print_device_descriptor(tuh_xfer_t* xfer);
@@ -50,12 +53,6 @@ static uint16_t currentState = 0; // Declara lastState para almacenar el estado 
 #define GAMEPAD_MODE 8 // Es mode???
 #define SCAN_CODE_SET_F0 0xf0
 #define SCAN_CODE_SET_E2 0xe2
-
-#define GAMEPAD_UP    2
-#define GAMEPAD_DOWN  3
-#define GAMEPAD_LEFT  4
-#define GAMEPAD_RIGHT 5
-#define GAMEPAD_FIRE  6
 
 // Estados de botones
 bool button_states[5] = {false, false, false, false, false}; // Estado actual (presionado o no)
@@ -89,6 +86,8 @@ u8 kb_inst = 0;
 u8 kb_leds = 0;  
 char device_str[50];
 char manufacturer_str[50];
+
+
 
 
 void tuh_kb_set_leds(u8 leds) {
@@ -212,203 +211,203 @@ void tuh_hid_report_received_cb(u8 dev_addr, u8 instance, u8 const* report, u16 
 }
 
 
-// Inicializa el GamePad con los pines correspondientes
-void GamePad_init(GamePad* gamepad, uint db9_pin_7, uint db9_pin_1, uint db9_pin_2, uint db9_pin_3, uint db9_pin_4, uint db9_pin_6, uint db9_pin_9) {
-    gamepad->_selectPin = db9_pin_7;
+// // Inicializa el GamePad con los pines correspondientes
+// void GamePad_init(GamePad* gamepad, uint db9_pin_7, uint db9_pin_1, uint db9_pin_2, uint db9_pin_3, uint db9_pin_4, uint db9_pin_6, uint db9_pin_9) {
+//     gamepad->_selectPin = db9_pin_7;
 
-    gamepad->_inputPins[0] = db9_pin_1;
-    gamepad->_inputPins[1] = db9_pin_2;
-    gamepad->_inputPins[2] = db9_pin_3;
-    gamepad->_inputPins[3] = db9_pin_4;
-    gamepad->_inputPins[4] = db9_pin_6;
-    gamepad->_inputPins[5] = db9_pin_9;
+//     gamepad->_inputPins[0] = db9_pin_1;
+//     gamepad->_inputPins[1] = db9_pin_2;
+//     gamepad->_inputPins[2] = db9_pin_3;
+//     gamepad->_inputPins[3] = db9_pin_4;
+//     gamepad->_inputPins[4] = db9_pin_6;
+//     gamepad->_inputPins[5] = db9_pin_9;
 
-    gpio_init(gamepad->_selectPin);
-    gpio_set_dir(gamepad->_selectPin, GPIO_OUT);
-    gpio_put(gamepad->_selectPin, 1);
+//     gpio_init(gamepad->_selectPin);
+//     gpio_set_dir(gamepad->_selectPin, GPIO_OUT);
+//     gpio_put(gamepad->_selectPin, 1);
 
-    for (int i = 0; i < SC_INPUT_PINS; i++) {
-        gpio_init(gamepad->_inputPins[i]);
-        gpio_set_dir(gamepad->_inputPins[i], GPIO_IN);
-        gpio_pull_up(gamepad->_inputPins[i]);
-    }
+//     for (int i = 0; i < SC_INPUT_PINS; i++) {
+//         gpio_init(gamepad->_inputPins[i]);
+//         gpio_set_dir(gamepad->_inputPins[i], GPIO_IN);
+//         gpio_pull_up(gamepad->_inputPins[i]);
+//     }
 
-    gamepad->_currentState = 0;
-    gamepad->_sixButtonMode = false;
-    gamepad->_lastReadTime = to_ms_since_boot(get_absolute_time());
-}
+//     gamepad->_currentState = 0;
+//     gamepad->_sixButtonMode = false;
+//     gamepad->_lastReadTime = to_ms_since_boot(get_absolute_time());
+// }
 
-// Devuelve el estado actual de los botones
-uint16_t GamePad_getState(GamePad* gamepad) {
-    uint32_t currentTime = to_ms_since_boot(get_absolute_time());
+// // Devuelve el estado actual de los botones
+// uint16_t GamePad_getState(GamePad* gamepad) {
+//     uint32_t currentTime = to_ms_since_boot(get_absolute_time());
 
-    if ((currentTime - gamepad->_lastReadTime) < SC_READ_DELAY_MS) {
-        return gamepad->_currentState;
-    }
+//     if ((currentTime - gamepad->_lastReadTime) < SC_READ_DELAY_MS) {
+//         return gamepad->_currentState;
+//     }
 
-    uint32_t savedInterrupts = save_and_disable_interrupts();
-    gamepad->_currentState = 0;
+//     uint32_t savedInterrupts = save_and_disable_interrupts();
+//     gamepad->_currentState = 0;
 
-    for (int cycle = 0; cycle < SC_CYCLES; cycle++) {
-        GamePad_readCycle(gamepad, cycle);
-    }
+//     for (int cycle = 0; cycle < SC_CYCLES; cycle++) {
+//         GamePad_readCycle(gamepad, cycle);
+//     }
 
-    if (!(gamepad->_currentState & SC_CTL_ON)) {
-        gamepad->_sixButtonMode = false;
-    }
+//     if (!(gamepad->_currentState & SC_CTL_ON)) {
+//         gamepad->_sixButtonMode = false;
+//     }
 
-    restore_interrupts(savedInterrupts);
-    gamepad->_lastReadTime = currentTime;
-    return gamepad->_currentState;
-}
+//     restore_interrupts(savedInterrupts);
+//     gamepad->_lastReadTime = currentTime;
+//     return gamepad->_currentState;
+// }
 
-// Lee un ciclo específico para obtener el estado de los botones
-void GamePad_readCycle(GamePad* gamepad, int cycle) {
-    gpio_put(gamepad->_selectPin, cycle % 2);
+// // Lee un ciclo específico para obtener el estado de los botones
+// void GamePad_readCycle(GamePad* gamepad, int cycle) {
+//     gpio_put(gamepad->_selectPin, cycle % 2);
 
-    switch (cycle) {
-        case 2:
-            gamepad->_currentState |= (gpio_get(gamepad->_inputPins[2]) == 0 && gpio_get(gamepad->_inputPins[3]) == 0) * SC_CTL_ON;
+//     switch (cycle) {
+//         case 2:
+//             gamepad->_currentState |= (gpio_get(gamepad->_inputPins[2]) == 0 && gpio_get(gamepad->_inputPins[3]) == 0) * SC_CTL_ON;
             
-            if (gamepad->_currentState & SC_CTL_ON) {
-                if (gpio_get(gamepad->_inputPins[4]) == 0) { gamepad->_currentState |= SC_BTN_A; }
-                if (gpio_get(gamepad->_inputPins[5]) == 0) { gamepad->_currentState |= SC_BTN_START; }
-            }
-            break;
+//             if (gamepad->_currentState & SC_CTL_ON) {
+//                 if (gpio_get(gamepad->_inputPins[4]) == 0) { gamepad->_currentState |= SC_BTN_A; }
+//                 if (gpio_get(gamepad->_inputPins[5]) == 0) { gamepad->_currentState |= SC_BTN_START; }
+//             }
+//             break;
 
-        case 3:
-            if (gpio_get(gamepad->_inputPins[0]) == 0) { gamepad->_currentState |= SC_BTN_UP; }
-            if (gpio_get(gamepad->_inputPins[1]) == 0) { gamepad->_currentState |= SC_BTN_DOWN; }
-            if (gpio_get(gamepad->_inputPins[2]) == 0) { gamepad->_currentState |= SC_BTN_LEFT; }
-            if (gpio_get(gamepad->_inputPins[3]) == 0) { gamepad->_currentState |= SC_BTN_RIGHT; }
-            if (gpio_get(gamepad->_inputPins[4]) == 0) { gamepad->_currentState |= SC_BTN_B; }
-            if (gpio_get(gamepad->_inputPins[5]) == 0) { gamepad->_currentState |= SC_BTN_C; }
-            break;
+//         case 3:
+//             if (gpio_get(gamepad->_inputPins[0]) == 0) { gamepad->_currentState |= SC_BTN_UP; }
+//             if (gpio_get(gamepad->_inputPins[1]) == 0) { gamepad->_currentState |= SC_BTN_DOWN; }
+//             if (gpio_get(gamepad->_inputPins[2]) == 0) { gamepad->_currentState |= SC_BTN_LEFT; }
+//             if (gpio_get(gamepad->_inputPins[3]) == 0) { gamepad->_currentState |= SC_BTN_RIGHT; }
+//             if (gpio_get(gamepad->_inputPins[4]) == 0) { gamepad->_currentState |= SC_BTN_B; }
+//             if (gpio_get(gamepad->_inputPins[5]) == 0) { gamepad->_currentState |= SC_BTN_C; }
+//             break;
 
-        case 4:
-            gamepad->_sixButtonMode = (gpio_get(gamepad->_inputPins[0]) == 0 && gpio_get(gamepad->_inputPins[1]) == 0);
-            break;
+//         case 4:
+//             gamepad->_sixButtonMode = (gpio_get(gamepad->_inputPins[0]) == 0 && gpio_get(gamepad->_inputPins[1]) == 0);
+//             break;
 
-        case 5:
-            if (gamepad->_sixButtonMode) {
-                if (gpio_get(gamepad->_inputPins[0]) == 0) { gamepad->_currentState |= SC_BTN_Z; }
-                if (gpio_get(gamepad->_inputPins[1]) == 0) { gamepad->_currentState |= SC_BTN_Y; }
-                if (gpio_get(gamepad->_inputPins[2]) == 0) { gamepad->_currentState |= SC_BTN_X; }
-                if (gpio_get(gamepad->_inputPins[3]) == 0) { gamepad->_currentState |= SC_BTN_MODE; }
-            }
-            break;
-    }
-}
+//         case 5:
+//             if (gamepad->_sixButtonMode) {
+//                 if (gpio_get(gamepad->_inputPins[0]) == 0) { gamepad->_currentState |= SC_BTN_Z; }
+//                 if (gpio_get(gamepad->_inputPins[1]) == 0) { gamepad->_currentState |= SC_BTN_Y; }
+//                 if (gpio_get(gamepad->_inputPins[2]) == 0) { gamepad->_currentState |= SC_BTN_X; }
+//                 if (gpio_get(gamepad->_inputPins[3]) == 0) { gamepad->_currentState |= SC_BTN_MODE; }
+//             }
+//             break;
+//     }
+// }
 
-void send_joy_action(u8 scancode, bool press) {
-    printf("***** KEYBOARD CONTROL\n");
-    kb_send(SCAN_CODE_SET_E2);
-    sleep_ms(SLEEP_TIME);
-    printf("----> KEY PRESSED: %s\n", press ? "TRUE" : "FALSE");
-    if (!press) {
-        kb_send(SCAN_CODE_SET_F0);
-        sleep_ms(SLEEP_TIME);
-    }
-    kb_send(scancode);
-    sleep_ms(SLEEP_TIME);
-    printf("**********************\n");
-}
+// void send_joy_action(u8 scancode, bool press) {
+//     printf("***** KEYBOARD CONTROL\n");
+//     kb_send(SCAN_CODE_SET_E2);
+//     sleep_ms(SLEEP_TIME);
+//     printf("----> KEY PRESSED: %s\n", press ? "TRUE" : "FALSE");
+//     if (!press) {
+//         kb_send(SCAN_CODE_SET_F0);
+//         sleep_ms(SLEEP_TIME);
+//     }
+//     kb_send(scancode);
+//     sleep_ms(SLEEP_TIME);
+//     printf("**********************\n");
+// }
 
-static uint32_t milliseconds = 0;
+// static uint32_t milliseconds = 0;
 
-// Función callback que se ejecuta cada milisegundo
-// Cambiar la firma para que coincida con alarm_callback_t
-int64_t timer_callback(int64_t alarm_time, void *user_data) {
-    milliseconds++;  // Incrementa cada vez que el temporizador se desborda (1ms)
-    return 0;  // Retorna 0 para indicar que el temporizador no se repite
-}
+// // Función callback que se ejecuta cada milisegundo
+// // Cambiar la firma para que coincida con alarm_callback_t
+// int64_t timer_callback(int64_t alarm_time, void *user_data) {
+//     milliseconds++;  // Incrementa cada vez que el temporizador se desborda (1ms)
+//     return 0;  // Retorna 0 para indicar que el temporizador no se repite
+// }
 
-// Función para inicializar el temporizador
-void setup_timer() {
-    // Configura el temporizador para que se ejecute cada milisegundo
-    add_alarm_in_ms(1, timer_callback, NULL, true);  // Llama a 'timer_callback' cada 1ms
-}
+// // Función para inicializar el temporizador
+// void setup_timer() {
+//     // Configura el temporizador para que se ejecute cada milisegundo
+//     add_alarm_in_ms(1, timer_callback, NULL, true);  // Llama a 'timer_callback' cada 1ms
+// }
 
-// Función millis() para obtener el tiempo transcurrido en milisegundos
-uint32_t millis() {
-    return milliseconds;
-}
+// // Función millis() para obtener el tiempo transcurrido en milisegundos
+// uint32_t millis() {
+//     return milliseconds;
+// }
 
 
-void check_joystick(GamePad* gamepad) {
-    currentState = GamePad_getState(gamepad);
+// void check_joystick(GamePad* gamepad) {
+//     currentState = GamePad_getState(gamepad);
 
-    // Verificar el cambio de estado para cada botón, evitando el rebote
-    if (currentState != lastState) {
-        // Verificar el cambio de estado para cada botón
-        if ((currentState & SC_BTN_UP) != (lastState & SC_BTN_UP)) {
-            // send_joy_action(ESP_JOY1UP, (currentState & SC_BTN_UP) != 0);
-            kb_send_key_gamepad_control(2,(currentState & SC_BTN_UP) != 0)
-        }
+//     // Verificar el cambio de estado para cada botón, evitando el rebote
+//     if (currentState != lastState) {
+//         // Verificar el cambio de estado para cada botón
+//         if ((currentState & SC_BTN_UP) != (lastState & SC_BTN_UP)) {
+//             // send_joy_action(ESP_JOY1UP, (currentState & SC_BTN_UP) != 0);
+//             kb_send_key_gamepad_control(2,(currentState & SC_BTN_UP) != 0);
+//         }
 
-        if ((currentState & SC_BTN_DOWN) != (lastState & SC_BTN_DOWN)) {
-            //send_joy_action(ESP_JOY1DOWN, (currentState & SC_BTN_DOWN) != 0);
-            kb_send_key_gamepad_control(3,(currentState & SC_BTN_DOWN) != 0);
-        }
+//         if ((currentState & SC_BTN_DOWN) != (lastState & SC_BTN_DOWN)) {
+//             //send_joy_action(ESP_JOY1DOWN, (currentState & SC_BTN_DOWN) != 0);
+//             kb_send_key_gamepad_control(3,(currentState & SC_BTN_DOWN) != 0);
+//         }
 
-        if ((currentState & SC_BTN_LEFT) != (lastState & SC_BTN_LEFT)) {
-            //send_joy_action(ESP_JOY1LEFT, (currentState & SC_BTN_LEFT) != 0);
-            kb_send_key_gamepad_control(0,(currentState & SC_BTN_LEFT) != 0);
-        }
+//         if ((currentState & SC_BTN_LEFT) != (lastState & SC_BTN_LEFT)) {
+//             //send_joy_action(ESP_JOY1LEFT, (currentState & SC_BTN_LEFT) != 0);
+//             kb_send_key_gamepad_control(0,(currentState & SC_BTN_LEFT) != 0);
+//         }
 
-        if ((currentState & SC_BTN_RIGHT) != (lastState & SC_BTN_RIGHT)) {
-            // send_joy_action(ESP_JOY1RIGHT, (currentState & SC_BTN_RIGHT) != 0);
-            kb_send_key_gamepad_control(1, (currentState & SC_BTN_RIGHT) != 0);
-        }
+//         if ((currentState & SC_BTN_RIGHT) != (lastState & SC_BTN_RIGHT)) {
+//             // send_joy_action(ESP_JOY1RIGHT, (currentState & SC_BTN_RIGHT) != 0);
+//             kb_send_key_gamepad_control(1, (currentState & SC_BTN_RIGHT) != 0);
+//         }
 
-        if ((currentState & SC_BTN_START) != (lastState & SC_BTN_START)) {
-            send_joy_action(ESP_JOY1START, (currentState & SC_BTN_START) != 0);
-        }
+//         if ((currentState & SC_BTN_START) != (lastState & SC_BTN_START)) {
+//             send_joy_action(ESP_JOY1START, (currentState & SC_BTN_START) != 0);
+//         }
 
-        if ((currentState & SC_BTN_A) != (lastState & SC_BTN_A)) {
-            // send_joy_action(ESP_JOY1A, (currentState & SC_BTN_A) != 0);
-            printf("paso por aqui\n")
-            kb_send_key_gamepad_control(6, (currentState & SC_BTN_A) != 0);
-        }
+//         if ((currentState & SC_BTN_A) != (lastState & SC_BTN_A)) {
+//             // send_joy_action(ESP_JOY1A, (currentState & SC_BTN_A) != 0);
+//             printf("paso por aqui\n");
+//             kb_send_key_gamepad_control(6, (currentState & SC_BTN_A) != 0);
+//         }
 
-        if ((currentState & SC_BTN_B) != (lastState & SC_BTN_B)) {
-            send_joy_action(ESP_JOY1B, (currentState & SC_BTN_B) != 0);
-        }
+//         if ((currentState & SC_BTN_B) != (lastState & SC_BTN_B)) {
+//             send_joy_action(ESP_JOY1B, (currentState & SC_BTN_B) != 0);
+//         }
 
-        if ((currentState & SC_BTN_C) != (lastState & SC_BTN_C)) {
-            send_joy_action(ESP_JOY1C, (currentState & SC_BTN_C) != 0);
-        }
+//         if ((currentState & SC_BTN_C) != (lastState & SC_BTN_C)) {
+//             send_joy_action(ESP_JOY1C, (currentState & SC_BTN_C) != 0);
+//         }
 
-        if ((currentState & SC_BTN_X) != (lastState & SC_BTN_X)) {
-            send_joy_action(ESP_JOY1X, (currentState & SC_BTN_X) != 0);
-        }
+//         if ((currentState & SC_BTN_X) != (lastState & SC_BTN_X)) {
+//             send_joy_action(ESP_JOY1X, (currentState & SC_BTN_X) != 0);
+//         }
 
-        if ((currentState & SC_BTN_Y) != (lastState & SC_BTN_Y)) {
-            send_joy_action(ESP_JOY1Y, (currentState & SC_BTN_Y) != 0);
-        }
+//         if ((currentState & SC_BTN_Y) != (lastState & SC_BTN_Y)) {
+//             send_joy_action(ESP_JOY1Y, (currentState & SC_BTN_Y) != 0);
+//         }
 
-        if ((currentState & SC_BTN_Z) != (lastState & SC_BTN_Z)) {
-            send_joy_action(ESP_JOY1Z, (currentState & SC_BTN_Z) != 0);
-        }
+//         if ((currentState & SC_BTN_Z) != (lastState & SC_BTN_Z)) {
+//             send_joy_action(ESP_JOY1Z, (currentState & SC_BTN_Z) != 0);
+//         }
 
-        if ((currentState & SC_BTN_1) != (lastState & SC_BTN_1)) {
-            send_joy_action(ESP_JOY1A, (currentState & SC_BTN_1) != 0);
-        }
+//         if ((currentState & SC_BTN_1) != (lastState & SC_BTN_1)) {
+//             send_joy_action(ESP_JOY1A, (currentState & SC_BTN_1) != 0);
+//         }
 
-        if ((currentState & SC_BTN_2) != (lastState & SC_BTN_2)) {
-            send_joy_action(ESP_JOY1Z, (currentState & SC_BTN_2) != 0);
-        }
+//         if ((currentState & SC_BTN_2) != (lastState & SC_BTN_2)) {
+//             send_joy_action(ESP_JOY1Z, (currentState & SC_BTN_2) != 0);
+//         }
 
-        if ((currentState & SC_BTN_MODE) != (lastState & SC_BTN_MODE)) {
-            send_joy_action(ESP_JOY1MODE, (currentState & SC_BTN_MODE) != 0);
-        }
+//         if ((currentState & SC_BTN_MODE) != (lastState & SC_BTN_MODE)) {
+//             send_joy_action(ESP_JOY1MODE, (currentState & SC_BTN_MODE) != 0);
+//         }
 
-        // Actualiza el estado anterior después de procesar el cambio
-        lastState = currentState;
-    }
-}
+//         // Actualiza el estado anterior después de procesar el cambio
+//         lastState = currentState;
+//     }
+// }
 
-uint32_t last_button_check = 0;  // Última vez que se verificó el botón
+// uint32_t last_button_check = 0;  // Última vez que se verificó el botón
 
 void main() {
   board_init();
@@ -433,18 +432,27 @@ void main() {
   kb_init(KBOUT, KBIN);
   ms_init(MSOUT, MSIN);
   
+
+
+  //Se usa en el mando sega para comprobrar botones extra, hay que ponerla a 0 o 1 de modo manual y hacer a continuacion la lectura
+  //de momento la desactivamos
+  //button_t *Joy1Select = create_button(joy1Select, onchange); 
+
+//   button_t *Joy1Start = create_button(joy1Start, onchange); // o tambien conocido como fire2
+
+
 //   static GamePad gamepad;
 //   GamePad_init(&gamepad, GAMEPAD_SELECT, GAMEPAD_UP, GAMEPAD_DOWN, GAMEPAD_LEFT, GAMEPAD_RIGHT, GAMEPAD_FIRE, 8);
 
     // Configurar GPIOs
-    const uint BUTTON_PINS[] = {GAMEPAD_UP, GAMEPAD_DOWN, GAMEPAD_LEFT, GAMEPAD_RIGHT, GAMEPAD_FIRE};
-    const int NUM_BUTTONS = sizeof(BUTTON_PINS) / sizeof(BUTTON_PINS[0]);
+    // const uint BUTTON_PINS[] = {GAMEPAD_UP, GAMEPAD_DOWN, GAMEPAD_LEFT, GAMEPAD_RIGHT, GAMEPAD_FIRE};
+    // const int NUM_BUTTONS = sizeof(BUTTON_PINS) / sizeof(BUTTON_PINS[0]);
 
-    for (int i = 0; i < NUM_BUTTONS; i++) {
-        gpio_init(BUTTON_PINS[i]);
-        gpio_set_dir(BUTTON_PINS[i], GPIO_IN);
-        gpio_pull_up(BUTTON_PINS[i]);
-    }
+    // for (int i = 0; i < NUM_BUTTONS; i++) {
+    //     gpio_init(BUTTON_PINS[i]);
+    //     gpio_set_dir(BUTTON_PINS[i], GPIO_IN);
+    //     gpio_pull_up(BUTTON_PINS[i]);
+    // }
     //     kb_send_key(0x52, 0, 0); // 0x52 cursor arriba
     //     printf("Joy1Up release\n");
     // break;
@@ -463,37 +471,37 @@ void main() {
     // case joy1Fire: 
     //     kb_send_key(0x2b, 0, 0); // tabulador
         // printf("Joy1Fire release \n");
+        // setup_timer();
+        // // ADD -> DESTROYER
+        // uint32_t current_time = time_us_32();  // Obtener tiempo actual en microsegundos
+        // if (current_time - last_button_check >= DEBOUNCE_TIME * 1000) {
+            
+        //     bool current_state_up = !gpio_get(GAMEPAD_UP);
+        //     static bool button_pressed_up = false;
 
+        //     if (current_state_up && !button_pressed_up) {
+        //         button_pressed_up = true;
+        //         kb_send_key_gamepad_control(2,true);
+        //     } else if (!current_state_up && button_pressed_up) {
+        //         button_pressed_up = false;
+        //         kb_send_key_gamepad_control(2,false);
+        //     }
+
+        //     bool current_state_left = !gpio_get(GAMEPAD_LEFT);
+        //     static bool button_pressed_left = false;
+
+        //     if (current_state_left && !button_pressed_left) {
+        //         button_pressed_left = true;
+        //         kb_send_key_gamepad_control(0,true);
+        //     } else if (!current_state_left && button_pressed_left) {
+        //         button_pressed_left = false;
+        //         kb_send_key_gamepad_control(0,false);
+        //     }
+        //     last_button_check = current_time;  // Actualiza la última verificación
+        // }
     while (1) {
         // check_joystick(&gamepad);
-        setup_timer();
-        // ADD -> DESTROYER
-        uint32_t current_time = time_us_32();  // Obtener tiempo actual en microsegundos
-        if (current_time - last_button_check >= DEBOUNCE_TIME * 1000) {
-            
-            bool current_state_up = !gpio_get(GAMEPAD_UP);
-            static bool button_pressed_up = false;
-
-            if (current_state_up && !button_pressed_up) {
-                button_pressed_up = true;
-                send_joy_action(ESP_JOY1UP, true);
-            } else if (!current_state_up && button_pressed_up) {
-                button_pressed_up = false;
-                send_joy_action(ESP_JOY1UP, false);
-            }
-
-            bool current_state_left = !gpio_get(GAMEPAD_LEFT);
-            static bool button_pressed_left = false;
-
-            if (current_state_left && !button_pressed_left) {
-                button_pressed_left = true;
-                send_joy_action(ESP_JOY1LEFT, true);
-            } else if (!current_state_left && button_pressed_left) {
-                button_pressed_left = false;
-                send_joy_action(ESP_JOY1LEFT, false);
-            }
-            last_button_check = current_time;  // Actualiza la última verificación
-        }
+        GamePadController();
         tuh_task();
         kb_task();
         ms_task();
@@ -515,49 +523,6 @@ void main() {
         // sleep_ms(10); // Retraso pequeño para evitar sobrecarga
 
 
-    }
-}
-
-
-// Función para manejar la acción al presionar un botón
-void on_button_press(uint button) {
-    switch (button) {
-        case UP:
-            send_joy_action(ESP_JOY1UP, true);
-            break;
-        case DOWN:
-            send_joy_action(ESP_JOY1DOWN, true);
-            break;
-        case LEFT:
-            send_joy_action(ESP_JOY1LEFT, true);
-            break;
-        case RIGHT:
-            send_joy_action(ESP_JOY1RIGHT, true);
-            break;
-        case FIRE:
-            send_joy_action(ESP_JOY1A, true);
-            break;
-    }
-}
-
-// Función para manejar la acción al soltar un botón
-void on_button_release(uint button) {
-    switch (button) {
-        case UP:
-            send_joy_action(ESP_JOY1UP, false);
-            break;
-        case DOWN:
-            send_joy_action(ESP_JOY1DOWN, false);
-            break;
-        case LEFT:
-            send_joy_action(ESP_JOY1LEFT, false);
-            break;
-        case RIGHT:
-            send_joy_action(ESP_JOY1RIGHT, false);
-            break;
-        case FIRE:
-            send_joy_action(ESP_JOY1A, false);
-            break;
     }
 }
 
