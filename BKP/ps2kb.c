@@ -30,6 +30,7 @@
 #include "ps2in.h"
 #include "hardware/watchdog.h"
 #include "scancodesets.h"
+#include "ps2joy.h"
 
 ps2out kb_out;
 ps2in kb_in;
@@ -61,7 +62,7 @@ ps2in kb_in;
 #define KB_MSG_RESEND_FE 0xfe
 
 // ADD -> DESTROYER
-bool button_pressed = false;  // Estado del botón
+// bool button_pressed = false;  // Estado del botón
 // END - DESTROYER
 
 
@@ -341,7 +342,6 @@ void kb_send_key_scs3(u8 key, bool is_key_pressed) {
 // ************************
 // GAMEPAD CONTROL
 // ************************
-
 #define SCAN_CODE_SET_F0 0xf0
 #define SCAN_CODE_SET_E2 0xe2
 
@@ -705,67 +705,25 @@ void kb_init(u8 gpio_out, u8 gpio_in) {
   kb_send(KB_MSG_SELFTEST_PASSED_AA);
 }
 
-// // Función para verificar el estado del botón
-// void check_button() {
-//     if (gpio_get(BUTTON_TESTING) == 0) {
-//         if (!button_pressed) {  // Si no estaba presionado antes
-//             kb_send_key_scs2(13, 0, 0);
-//             // printf("Hola\n");
-//             button_pressed = true;  // Marca el botón como presionado
-            
-//         }
-//     } else {
-//         button_pressed = false;  // Resetea el estado cuando el botón se suelta
+// void send_Joy_Action(int scancode, bool press) {
+//   kb_send(0xE2);
+//   sleep_ms(25);
+//   if (!press) {
+//     kb_send(KBHOSTCMD_SET_SCAN_CODE_SET_F0);
+//     sleep_ms(25);
+//   }
+//   kb_send(scancode);
+//   sleep_ms(25);
+// }
+
+// void check_joystick() {
+//     bool current_state = !gpio_get(BUTTON_TESTING);
+//     if (current_state && !button_pressed) {
+//         button_pressed = true;
+//         send_Joy_Action(0x42, true);
+//     } 
+//     else if (!current_state && button_pressed) {
+//         button_pressed = false;
+//         send_Joy_Action(0x42, false);
 //     }
 // }
-void send_Joy_Action(int scancode, bool press) {
-  kb_send(KBHOSTCMD_SET_SCAN_CODE_SET_E2);
-  sleep_ms(25);
-  if (!press) {
-    kb_send(KBHOSTCMD_SET_SCAN_CODE_SET_F0);
-    sleep_ms(25);
-  }
-  kb_send(scancode);
-  sleep_ms(25);
-}
-
-
-
-void check_button() {
-    set_scancodeset(4);
-    bool current_state = !gpio_get(BUTTON_TESTING);  // Leer el estado actual del botón (inverso porque está en pull-up)
-    set_scancodeset(4);
-    // Detectar cuando el botón pasa de no presionado a presionado
-    // kb_send(KB_EXT_PFX_E0);
-    // sleep_ms(25);
-    if (current_state && !button_pressed) {
-        // set_scancodeset(4);
-        button_pressed = true;
-        send_Joy_Action(0x42, true);
-        // kb_send_key_gam3epad_control(0, button_pressed); // Enviar código como si se presionara
-        //kb_send_key(35, button_pressed,0);
-        //  kb_send(0x40);
-        //  sleep_ms(25);
-        kb_send_key_gamepad_control(1, button_pressed);
-        // Enviar el código PS/2 cuando el botón es presionado
-        // kb_send(0x40); // Código de ejemplo (enviar el código que necesites)
-        // kb_send_key_scs2(40,0,0);
-    } 
-    else if (!current_state && button_pressed) {
-        button_pressed = false;
-        send_Joy_Action(0x42, false);
-        // kb_send(KB_BREAK_2_3);
-        // kb_send(0x40);
-        // sleep_ms(25);
-        //kb_send_key(35, button_pressed,0);
-        kb_send_key_gamepad_control(1, button_pressed);
-                // sleep_ms(50); // Esperar un poco antes de enviar el siguiente
-        // kb_send_key_gamepad_control(0, button_pressed); // Liberar el código
-        // kb_send_key_scs2(0x1C,1,0);
-        // Enviar el código de liberación (soltar la tecla)
-        // kb_send(0xF0); // Código para "break"
-        // kb_send(0x40); // Mismo código de tecla para indicar que se suelta
-    }
-    set_scancodeset(2);
-
-}
