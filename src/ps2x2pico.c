@@ -181,6 +181,26 @@ void main() {
   gpio_init(BUTTON_TESTING);
   gpio_set_dir(BUTTON_TESTING, GPIO_IN);
   gpio_pull_up(BUTTON_TESTING);  // Habilita resistencia pull-up interna
+
+  gpio_init(GAMEPAD_UP);
+  gpio_set_dir(GAMEPAD_UP, GPIO_IN);
+  gpio_pull_up(GAMEPAD_UP);  // Habilita resistencia pull-up interna
+
+  gpio_init(GAMEPAD_DOWN);
+  gpio_set_dir(GAMEPAD_DOWN, GPIO_IN);
+  gpio_pull_up(GAMEPAD_DOWN);  // Habilita resistencia pull-up interna
+
+    gpio_init(GAMEPAD_LEFT);
+  gpio_set_dir(GAMEPAD_LEFT, GPIO_IN);
+  gpio_pull_up(GAMEPAD_LEFT);  // Habilita resistencia pull-up interna
+
+    gpio_init(GAMEPAD_RIGHT);
+  gpio_set_dir(GAMEPAD_RIGHT, GPIO_IN);
+  gpio_pull_up(GAMEPAD_RIGHT);  // Habilita resistencia pull-up interna
+
+    gpio_init(GAMEPAD_FIRE);
+  gpio_set_dir(GAMEPAD_FIRE, GPIO_IN);
+  gpio_pull_up(GAMEPAD_FIRE);  // Habilita resistencia pull-up interna
   // END - DESTROYER
 
   gpio_set_dir(LVOUT, GPIO_OUT);
