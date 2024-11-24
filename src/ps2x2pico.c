@@ -202,6 +202,18 @@ bool is_button_pressed(uint pin) {
     }
     return false;  // El estado no ha cambiado
 }
+#define ESP_JOY1LEFT 0x40
+#define ESP_JOY1RIGHT 0x41
+#define ESP_JOY1UP 0x42
+#define ESP_JOY1DOWN 0x43
+#define ESP_JOY1START 0x44
+#define ESP_JOY1MODE 0x45
+#define ESP_JOY1A 0x46
+#define ESP_JOY1B 0x47
+#define ESP_JOY1C 0x48
+#define ESP_JOY1X 0x49
+#define ESP_JOY1Y 0x4a
+#define ESP_JOY1Z 0x4b
 
 int main() {
     board_init();
@@ -237,48 +249,46 @@ int main() {
     gpio_pull_up(GAMEPAD_FIRE);
 
     while (1) {
-
         tuh_task();
         kb_task();
-
-        // Verificar el estado de cada uno de los botones y realizar la acción correspondiente
+        
         if (is_button_pressed(GAMEPAD_UP)) {
             if (gpio_get(GAMEPAD_UP) == 0) {
-                printf("Botón 1 presionado\n");
+                kb_send_key_gamepad_control(2, true);
             } else {
-                printf("Botón 1 liberado\n");
+              kb_send_key_gamepad_control(2, false);
             }
         }
 
         if (is_button_pressed(GAMEPAD_DOWN)) {
             if (gpio_get(GAMEPAD_DOWN) == 0) {
-                printf("Botón 2 presionado\n");
+              kb_send_key_gamepad_control(3, true);
             } else {
-                printf("Botón 2 liberado\n");
+              kb_send_key_gamepad_control(3, false);
             }
         }
 
         if (is_button_pressed(GAMEPAD_LEFT)) {
             if (gpio_get(GAMEPAD_LEFT) == 0) {
-                printf("Botón 3 presionado\n");
+              kb_send_key_gamepad_control(0, true);
             } else {
-                printf("Botón 3 liberado\n");
+              kb_send_key_gamepad_control(0, false);
             }
         }
 
         if (is_button_pressed(GAMEPAD_RIGHT)) {
             if (gpio_get(GAMEPAD_RIGHT) == 0) {
-                printf("Botón 4 presionado\n");
+                kb_send_key_gamepad_control(1, true);
             } else {
-                printf("Botón 4 liberado\n");
+              kb_send_key_gamepad_control(1, false);
             }
         }
 
         if (is_button_pressed(GAMEPAD_FIRE)) {
             if (gpio_get(GAMEPAD_FIRE) == 0) {
-                printf("Botón 5 presionado\n");
+              kb_send_key_gamepad_control(6, true);
             } else {
-                printf("Botón 5 liberado\n");
+              kb_send_key_gamepad_control(6, false);
             }
         }
 

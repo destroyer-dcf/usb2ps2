@@ -51,9 +51,9 @@ void ms_usb_receive(u8 const* report);
 bool ms_task();
 
 // ADD -> DESTROYER
-
+// void kb_send_key_gamepad_control(u8 key, bool is_key_pressed)
 // Prototipos
-void update_button_states();
-void process_button_changes();
-void debug_buttons();
+// void update_button_states();
+// void process_button_changes();
+// void debug_buttons();
 // END - DESTROYER
