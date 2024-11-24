@@ -26,6 +26,8 @@ Este proyecto es un fork de https://github.com/No0ne/ps2x2pico pensado como adap
 | 1    | JST XH2.54 4 pin| [ver](https://acortar.link/VGCncE)    |
 | 1    | JST XH2.54 2 pin (opcional)| [ver](https://acortar.link/VGCncE)    |
 | 1    | LED (opcional)| [ver](https://acortar.link/jYP3aA)    |
+| 1    | Adaptador USB-C a USB | [ver](https://es.aliexpress.com/item/1005004621683764.html#nav-specification) |
+
 
 # Soldar JST XH2.54 4 pin a Dim 6
 
