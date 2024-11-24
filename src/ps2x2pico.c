@@ -164,72 +164,182 @@ void tuh_hid_report_received_cb(u8 dev_addr, u8 instance, u8 const* report, u16 
   }
 }
 
+bool is_button_pressed(uint pin) {
+    static uint64_t last_press_time[5] = {0};  // Marca de tiempo de los botones
+    static bool last_state[5] = {true, true, true, true, true};  // Estado anterior de los botones (asumido como no presionado)
+    uint64_t current_time = time_us_64();  // Tiempo actual en microsegundos
+    int button_index = -1;
 
-uint32_t last_button_check = 0;  // Última vez que se verificó el botón
+    // Mapeo de pines a índices
+    switch(pin) {
+        case GAMEPAD_UP:
+            button_index = 0;
+            break;
+        case GAMEPAD_DOWN:
+            button_index = 1;
+            break;
+        case GAMEPAD_LEFT:
+            button_index = 2;
+            break;
+        case GAMEPAD_RIGHT:
+            button_index = 3;
+            break;
+        case GAMEPAD_FIRE:
+            button_index = 4;
+            break;
+        default:
+            return false;  // Pin desconocido
+    }
+
+    // Verificar si el botón está presionado (activa bajo)
+    bool current_state = gpio_get(pin) == 0;
+
+    // Si el estado ha cambiado y ha pasado el tiempo de debounce
+    if (current_state != last_state[button_index] && (current_time - last_press_time[button_index]) > 100000) {
+        last_press_time[button_index] = current_time;
+        last_state[button_index] = current_state;
+        return true;  // El estado ha cambiado
+    }
+    return false;  // El estado no ha cambiado
+}
+
+int main() {
+    board_init();
+    printf("\n%s-%s\n", PICO_PROGRAM_NAME, PICO_PROGRAM_VERSION_STRING);
+
+    gpio_init(LVOUT);
+    gpio_init(LVIN);
+    gpio_set_dir(LVOUT, GPIO_OUT);
+    gpio_set_dir(LVIN, GPIO_OUT);
+    gpio_put(LVOUT, 1);
+    gpio_put(LVIN, 1);
+    
+    tusb_init();
+    kb_init(KBOUT, KBIN);
+    ms_init(MSOUT, MSIN);
 
 
-
-void main() {
-  board_init();
-  printf("\n%s-%s\n", PICO_PROGRAM_NAME, PICO_PROGRAM_VERSION_STRING);
-
-  gpio_init(LVOUT);
-  gpio_init(LVIN);
-
-  // ADD - DESTROYER
-  printf("Waiting for ESPectrum...\n");
-  gpio_init(BUTTON_TESTING);
-  gpio_set_dir(BUTTON_TESTING, GPIO_IN);
-  gpio_pull_up(BUTTON_TESTING);  // Habilita resistencia pull-up interna
-
-  gpio_init(GAMEPAD_UP);
-  gpio_set_dir(GAMEPAD_UP, GPIO_IN);
-  gpio_pull_up(GAMEPAD_UP);  // Habilita resistencia pull-up interna
-
-  gpio_init(GAMEPAD_DOWN);
-  gpio_set_dir(GAMEPAD_DOWN, GPIO_IN);
-  gpio_pull_up(GAMEPAD_DOWN);  // Habilita resistencia pull-up interna
-
-    gpio_init(GAMEPAD_LEFT);
-  gpio_set_dir(GAMEPAD_LEFT, GPIO_IN);
-  gpio_pull_up(GAMEPAD_LEFT);  // Habilita resistencia pull-up interna
-
+    gpio_init(GAMEPAD_UP);
+    gpio_init(GAMEPAD_DOWN);
+    gpio_init(GAMEPAD_LEFT); 
     gpio_init(GAMEPAD_RIGHT);
-  gpio_set_dir(GAMEPAD_RIGHT, GPIO_IN);
-  gpio_pull_up(GAMEPAD_RIGHT);  // Habilita resistencia pull-up interna
+    gpio_init(GAMEPAD_FIRE); 
+    gpio_set_dir(GAMEPAD_UP, GPIO_IN);
+    gpio_set_dir(GAMEPAD_DOWN, GPIO_IN);
+    gpio_set_dir(GAMEPAD_LEFT, GPIO_IN);
+    gpio_set_dir(GAMEPAD_RIGHT, GPIO_IN);
+    gpio_set_dir(GAMEPAD_FIRE, GPIO_IN);
 
-    gpio_init(GAMEPAD_FIRE);
-  gpio_set_dir(GAMEPAD_FIRE, GPIO_IN);
-  gpio_pull_up(GAMEPAD_FIRE);  // Habilita resistencia pull-up interna
-  // END - DESTROYER
-
-  gpio_set_dir(LVOUT, GPIO_OUT);
-  gpio_set_dir(LVIN, GPIO_OUT);
-  gpio_put(LVOUT, 1);
-  gpio_put(LVIN, 1);
-  
-  tusb_init();
-  kb_init(KBOUT, KBIN);
-  ms_init(MSOUT, MSIN);
-  
+    gpio_pull_up(GAMEPAD_UP);
+    gpio_pull_up(GAMEPAD_DOWN);
+    gpio_pull_up(GAMEPAD_LEFT);
+    gpio_pull_up(GAMEPAD_RIGHT);
+    gpio_pull_up(GAMEPAD_FIRE);
 
     while (1) {
 
-        // ADD -> DESTROYER
-        uint32_t current_time = time_us_32();  // Obtener tiempo actual en microsegundos
-        if (current_time - last_button_check >= DEBOUNCE_TIME * 1000) {
-            
-            check_button();  // Verifica el estado del botón
-            last_button_check = current_time;  // Actualiza la última verificación
-        }
-        // END - DESTROYER
-
         tuh_task();
         kb_task();
+
+        // Verificar el estado de cada uno de los botones y realizar la acción correspondiente
+        if (is_button_pressed(GAMEPAD_UP)) {
+            if (gpio_get(GAMEPAD_UP) == 0) {
+                printf("Botón 1 presionado\n");
+            } else {
+                printf("Botón 1 liberado\n");
+            }
+        }
+
+        if (is_button_pressed(GAMEPAD_DOWN)) {
+            if (gpio_get(GAMEPAD_DOWN) == 0) {
+                printf("Botón 2 presionado\n");
+            } else {
+                printf("Botón 2 liberado\n");
+            }
+        }
+
+        if (is_button_pressed(GAMEPAD_LEFT)) {
+            if (gpio_get(GAMEPAD_LEFT) == 0) {
+                printf("Botón 3 presionado\n");
+            } else {
+                printf("Botón 3 liberado\n");
+            }
+        }
+
+        if (is_button_pressed(GAMEPAD_RIGHT)) {
+            if (gpio_get(GAMEPAD_RIGHT) == 0) {
+                printf("Botón 4 presionado\n");
+            } else {
+                printf("Botón 4 liberado\n");
+            }
+        }
+
+        if (is_button_pressed(GAMEPAD_FIRE)) {
+            if (gpio_get(GAMEPAD_FIRE) == 0) {
+                printf("Botón 5 presionado\n");
+            } else {
+                printf("Botón 5 liberado\n");
+            }
+        }
+
+        // Un pequeño retraso para evitar el uso excesivo de la CPU
+        // sleep_ms(10);
+
         ms_task();
 
+
     }
+    
+    return 0;
 }
+
+// void main() {
+//   board_init();
+//   printf("\n%s-%s\n", PICO_PROGRAM_NAME, PICO_PROGRAM_VERSION_STRING);
+
+//   gpio_init(LVOUT);
+//   gpio_init(LVIN);
+
+//   // // ADD - DESTROYER
+//   printf("Waiting for ESPectrum...\n");
+//     // Configurar pines como entradas con pull-ups
+//     const uint BUTTON_PINS[] = {GAMEPAD_UP, GAMEPAD_DOWN, GAMEPAD_LEFT, GAMEPAD_RIGHT, GAMEPAD_FIRE};
+//     for (int i = 0; i < 5; i++) {
+//         gpio_init(BUTTON_PINS[i]);
+//         gpio_set_dir(BUTTON_PINS[i], GPIO_IN);
+//         gpio_pull_up(BUTTON_PINS[i]);
+//     }
+//   // // END - DESTROYER
+
+//   gpio_set_dir(LVOUT, GPIO_OUT);
+//   gpio_set_dir(LVIN, GPIO_OUT);
+//   gpio_put(LVOUT, 1);
+//   gpio_put(LVIN, 1);
+  
+//   tusb_init();
+//   kb_init(KBOUT, KBIN);
+//   ms_init(MSOUT, MSIN);
+  
+
+//     while (1) {
+
+
+//         tuh_task();
+//         kb_task();
+//         ms_task();
+
+//         // // ADD -> DESTROYER
+//         // uint32_t current_time = time_us_32();  // Obtener tiempo actual en microsegundos
+//         // if (current_time - last_button_check >= DEBOUNCE_TIME * 1000) {
+            
+//         //     check_button();  // Verifica el estado del botón
+//         //     last_button_check = current_time;  // Actualiza la última verificación
+            
+//         // }
+//         // // END - DESTROYER
+//     }
+    
+// }
 
 void reset() {
   printf("\n\n *** PANIC via tinyusb: watchdog reset!\n\n");

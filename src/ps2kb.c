@@ -35,14 +35,34 @@
 ps2out kb_out;
 ps2in kb_in;
 
-#define joy1Up 2 
-#define joy1Down 3
-#define joy1Left 4 
-#define joy1Right 5 
-#define joy1Fire 6 
-#define joy1Select 7 // Para joyStick SEGA
-#define joy1Start 8 // Para joyStick SEGA
+// #define joy1Up 2 
+// #define joy1Down 3
+// #define joy1Left 4 
+// #define joy1Right 5 
+// #define joy1Fire 6 
+// #define joy1Select 7 // Para joyStick SEGA
+// #define joy1Start 8 // Para joyStick SEGA
 
+#define GAMEPAD_SELECT 7
+#define GAMEPAD_UP 2 
+#define GAMEPAD_DOWN 3
+#define GAMEPAD_LEFT 4 
+#define GAMEPAD_RIGHT 5 
+#define GAMEPAD_FIRE 6 
+#define GAMEPAD_MODE 8 // Es mode???
+#define SCAN_CODE_SET_F0 0xf0
+#define SCAN_CODE_SET_E2 0xe2
+
+// Estado de los botones
+// uint8_t button_state = 0;     // Estado actual de los botones
+uint8_t previous_state = 0;   // Estado anterior de los botones
+
+// Máscaras para los botones
+#define MASK_UP    (1 << 0)
+#define MASK_DOWN  (1 << 1)
+#define MASK_LEFT  (1 << 2)
+#define MASK_RIGHT (1 << 3)
+#define MASK_FIRE  (1 << 4)
 
 #define KBHOSTCMD_RESET_FF 0xff
 #define KBHOSTCMD_RESEND_FE 0xfe
@@ -79,6 +99,18 @@ bool button_pressed_right = false;  // Estado del botón
 bool button_pressed_fire = false;  // Estado del botón
 // END - DESTROYER
 
+#define ESP_JOY1LEFT 0x40
+#define ESP_JOY1RIGHT 0x41
+#define ESP_JOY1UP 0x42
+#define ESP_JOY1DOWN 0x43
+#define ESP_JOY1START 0x44
+#define ESP_JOY1MODE 0x45
+#define ESP_JOY1A 0x46
+#define ESP_JOY1B 0x47
+#define ESP_JOY1C 0x48
+#define ESP_JOY1X 0x49
+#define ESP_JOY1Y 0x4a
+#define ESP_JOY1Z 0x4b
 
 typedef enum {
   KBH_STATE_IDLE,
@@ -733,97 +765,97 @@ void kb_init(u8 gpio_out, u8 gpio_in) {
 //         button_pressed = false;  // Resetea el estado cuando el botón se suelta
 //     }
 // }
-void send_Joy_Action(int scancode, bool press) {
-  kb_send(KBHOSTCMD_SET_SCAN_CODE_SET_E2);
-  sleep_ms(25);
+void sendPadScancode(int scancode, bool press) {
+  kb_send(SCAN_CODE_SET_E2);
+  sleep_ms(50);
   if (!press) {
-    kb_send(KBHOSTCMD_SET_SCAN_CODE_SET_F0);
-    sleep_ms(25);
+    kb_send(SCAN_CODE_SET_F0);
+    sleep_ms(50);
   }
   kb_send(scancode);
-  sleep_ms(25);
+  sleep_ms(50);
 }
 
-// Rutina control jopystick's
-void onchange(button_t *button_p) {
-  button_t *button = (button_t*)button_p;
-  //printf("Button on pin %d changed its state to %d\n", button->pin, button->state);
 
-//de momento los 2 puertos de joystcik actuan igual, queda pendiente reasignar las teclas correspondientes a cada uno
+// // Rutina control jopystick's
+// void onchange(button_t *button_p) {
+//   button_t *button = (button_t*)button_p;
+//   //printf("Button on pin %d changed its state to %d\n", button->pin, button->state);
 
-//Cuando soltamos un boton
-  if(button->state) {printf ("el state del pin %d es %d ¿Hemos SOLTADO el boton?\n",button->pin,button->state);
-  switch(button->pin){
+// //de momento los 2 puertos de joystcik actuan igual, queda pendiente reasignar las teclas correspondientes a cada uno
 
-  //Comprobamos el joy1 si hemos soltado un boton 
-    case joy1Up:
-        //kb_send_key(0x52, 0, 0); // 0x52 cursor arriba
-        kb_send_key_gamepad_control(2,false);
-        //send_joy_action(ESP_JOY1UP,false);
-    break;
-    case joy1Down:
-        //kb_send_key(0x51, 0, 0); // 0x51 cursor abajo
-        // send_joy_action(ESP_JOY1DOWN,false);
-        kb_send_key_gamepad_control(3,false);
-    break;
-    case joy1Left:
-        //kb_send_key(0x50, 0, 0); //0x50 cursor izquierda
-        // send_joy_action(ESP_JOY1LEFT,false);
-        kb_send_key_gamepad_control(0,false);
-    break;
-    case joy1Right:
-        //kb_send_key(0x4f, 0, 0); //0x4f cursor derecha
-        //send_joy_action(ESP_JOY1RIGHT,false);
-        kb_send_key_gamepad_control(1,false);
-    break;
-    case joy1Fire: 
-        //kb_send_key(0x2b, 0, 0); // tabulador
-        // send_joy_action(ESP_JOY1A,false);
-        kb_send_key_gamepad_control(6,false);
-    break; 
-  }
+// //Cuando soltamos un boton
+//   if(button->state) {printf ("el state del pin %d es %d ¿Hemos SOLTADO el boton?\n",button->pin,button->state);
+//   switch(button->pin){
+
+//   //Comprobamos el joy1 si hemos soltado un boton 
+//     case joy1Up:
+//         //kb_send_key(0x52, 0, 0); // 0x52 cursor arriba
+//         kb_send_key_gamepad_control(2,false);
+//         //send_joy_action(ESP_JOY1UP,false);
+//     break;
+//     case joy1Down:
+//         //kb_send_key(0x51, 0, 0); // 0x51 cursor abajo
+//         // send_joy_action(ESP_JOY1DOWN,false);
+//         kb_send_key_gamepad_control(3,false);
+//     break;
+//     case joy1Left:
+//         //kb_send_key(0x50, 0, 0); //0x50 cursor izquierda
+//         // send_joy_action(ESP_JOY1LEFT,false);
+//         kb_send_key_gamepad_control(0,false);
+//     break;
+//     case joy1Right:
+//         //kb_send_key(0x4f, 0, 0); //0x4f cursor derecha
+//         //send_joy_action(ESP_JOY1RIGHT,false);
+//         kb_send_key_gamepad_control(1,false);
+//     break;
+//     case joy1Fire: 
+//         //kb_send_key(0x2b, 0, 0); // tabulador
+//         // send_joy_action(ESP_JOY1A,false);
+//         kb_send_key_gamepad_control(6,false);
+//     break; 
+//   }
   
-  //kb_send_key(0x52, 0, 0);
-   return;}
+//   //kb_send_key(0x52, 0, 0);
+//    return;}
    
-   //cuando pulsamos un boton
-   if(!button->state) {;
-   switch(button->pin){
+//    //cuando pulsamos un boton
+//    if(!button->state) {;
+//    switch(button->pin){
 
-   //comprobamos el joy1 si hemos pulsado un boton 
-    case joy1Up:
-        //kb_send_key(ESP_JOY1UP, 1, 0); // 0x52 cursor arriba 
-        kb_send_key_gamepad_control(2,true);
-    break;
-    case joy1Down:
-        kb_send_key_gamepad_control(3,true);
-        //kb_send_key(0x51, 1, 0); // 0x51 cursor abajo 
-    break;
-    case joy1Left:
-        //kb_send_key(0x50, 1, 0); // 0x50 cursor izquierda
-        kb_send_key_gamepad_control(0,true);
-    break;
-    case joy1Right:
-        kb_send_key_gamepad_control(1,true);
-        //kb_send_key(0x4f, 1, 0);// 0x4f cursor derecha
-    break;
-    case joy1Fire:
-        //kb_send_key(0x2b, 1, 0);// 0x2b tabulador
-        kb_send_key_gamepad_control(6,true);
-    break;
-  }
+//    //comprobamos el joy1 si hemos pulsado un boton 
+//     case joy1Up:
+//         //kb_send_key(ESP_JOY1UP, 1, 0); // 0x52 cursor arriba 
+//         kb_send_key_gamepad_control(2,true);
+//     break;
+//     case joy1Down:
+//         kb_send_key_gamepad_control(3,true);
+//         //kb_send_key(0x51, 1, 0); // 0x51 cursor abajo 
+//     break;
+//     case joy1Left:
+//         //kb_send_key(0x50, 1, 0); // 0x50 cursor izquierda
+//         kb_send_key_gamepad_control(0,true);
+//     break;
+//     case joy1Right:
+//         kb_send_key_gamepad_control(1,true);
+//         //kb_send_key(0x4f, 1, 0);// 0x4f cursor derecha
+//     break;
+//     case joy1Fire:
+//         //kb_send_key(0x2b, 1, 0);// 0x2b tabulador
+//         kb_send_key_gamepad_control(6,true);
+//     break;
+//   }
    
    
-   return; }
-}
+//    return; }
+// }
 
 void check_button() {
-  
+
     set_scancodeset(4);
 
-    bool current_state_up = !gpio_get(GAMEPAD_UP);  // Leer el estado actual del botón (inverso porque está en pull-up)
+    bool current_state_up = !gpio_get(GAMEPAD_UP);
     if (current_state_up && !button_pressed_up) {
-        // set_scancodeset(4);
         button_pressed_up = true;
         kb_send_key_gamepad_control(2, button_pressed_up);
     } 
@@ -832,7 +864,7 @@ void check_button() {
         kb_send_key_gamepad_control(2, button_pressed_up);
     }
 
-    bool current_state_down = !gpio_get(GAMEPAD_DOWN);  // Leer el estado actual del botón (inverso porque está en pull-up)
+    bool current_state_down = !gpio_get(GAMEPAD_DOWN); 
     if (current_state_down && !button_pressed_down) {
         button_pressed_down = true;
         kb_send_key_gamepad_control(3, button_pressed_down);
@@ -842,7 +874,7 @@ void check_button() {
         kb_send_key_gamepad_control(3, button_pressed_down);
     }
 
-    bool current_state_left = !gpio_get(GAMEPAD_LEFT);  // Leer el estado actual del botón (inverso porque está en pull-up)
+    bool current_state_left = !gpio_get(GAMEPAD_LEFT); 
     if (current_state_left && !button_pressed_left) {
         button_pressed_left = true;
         kb_send_key_gamepad_control(0, button_pressed_left);
@@ -852,7 +884,7 @@ void check_button() {
         kb_send_key_gamepad_control(0, button_pressed_left);
     }
 
-    bool current_state_right = !gpio_get(GAMEPAD_RIGHT);  // Leer el estado actual del botón (inverso porque está en pull-up)
+    bool current_state_right = !gpio_get(GAMEPAD_RIGHT);
     if (current_state_right && !button_pressed_right) {
         button_pressed_right = true;
         kb_send_key_gamepad_control(1, button_pressed_right);
@@ -862,7 +894,7 @@ void check_button() {
         kb_send_key_gamepad_control(1, button_pressed_right);
     }
 
-    bool current_state_fire = !gpio_get(GAMEPAD_FIRE);  // Leer el estado actual del botón (inverso porque está en pull-up)
+    bool current_state_fire = !gpio_get(GAMEPAD_FIRE);
     if (current_state_fire && !button_pressed_fire) {
         button_pressed_fire = true;
         kb_send_key_gamepad_control(6, button_pressed_fire);

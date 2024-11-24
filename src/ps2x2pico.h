@@ -51,5 +51,9 @@ void ms_usb_receive(u8 const* report);
 bool ms_task();
 
 // ADD -> DESTROYER
-void check_button();
+
+// Prototipos
+void update_button_states();
+void process_button_changes();
+void debug_buttons();
 // END - DESTROYER

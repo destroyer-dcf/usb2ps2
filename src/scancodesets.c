@@ -95,6 +95,18 @@ u8 const gamepad_scancodes[] = {
     0x4A,  // BUTTON_Y
     0x4B   // BUTTON_Z
 };
+// sendPadScancode(ESP_JOY1UP, true)
+// sendPadScancode(ESP_JOY1DOWN, true)
+// sendPadScancode(ESP_JOY1LEFT, true)
+// sendPadScancode(ESP_JOY1RIGHT, true)
+// sendPadScancode(ESP_JOY1A, true)
+
+// sendPadScancode(ESP_JOY1UP, false)
+// sendPadScancode(ESP_JOY1DOWN, false)
+// sendPadScancode(ESP_JOY1LEFT, false)
+// sendPadScancode(ESP_JOY1RIGHT, false)
+// sendPadScancode(ESP_JOY1A, false)
+
       // ESP_JOY1LEFT = 0x40,
       // ESP_JOY1RIGHT = 0x41,
       // ESP_JOY1UP = 0x42,
