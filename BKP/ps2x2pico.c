@@ -33,8 +33,7 @@
 #include "bsp/board_api.h"
 #include "tusb.h"
 #include "ps2x2pico.h"
-#include "button.h"
-#include "ps2pad.h"
+
 
 // #define ESP_JOY1LEFT 0x40
 // #define ESP_JOY1RIGHT 0x41
