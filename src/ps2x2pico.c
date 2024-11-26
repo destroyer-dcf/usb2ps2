@@ -50,60 +50,9 @@ u8 kb_leds = 0;
 char device_str[50];
 char manufacturer_str[50];
 
-// Rutina control jopystick's
-void onchange(button_t *button_p) {
-  button_t *button = (button_t*)button_p;
-//Cuando soltamos un boton
-  if(button->state) {printf ("el state del pin %d es %d ¿Hemos SOLTADO el boton?\n",button->pin,button->state);
-  switch(button->pin){
-
-  //Comprobamos el joy1 si hemos soltado un boton 
-    case joy1Up:
-        kb_send_key_gamepad_control(2, false);
-        break;
-    case joy1Down:
-        kb_send_key_gamepad_control(3, false);
-        break;
-    case joy1Left:
-        kb_send_key_gamepad_control(0, false);
-        break;
-    case joy1Right:
-        kb_send_key_gamepad_control(1, false);
-        break;
-    case joy1Fire: 
-        kb_send_key_gamepad_control(6, false);
-        break;
-  }
-  
-   return;}
-   
-   //cuando pulsamos un boton
-   if(!button->state) {printf ("el state del pin %d es %d ¿Hemos pulsado el boton?\n",button->pin,button->state);
-   switch(button->pin){
-
-   //comprobamos el joy1 si hemos pulsado un boton 
-    case joy1Up:
-        kb_send_key_gamepad_control(2, true);
-        break;
-    case joy1Down:
-        kb_send_key_gamepad_control(3, true); 
-        break;
-    case joy1Left:
-      kb_send_key_gamepad_control(0, true);
-      break;
-    case joy1Right:
-        kb_send_key_gamepad_control(1, true);
-        break;
-    case joy1Fire:
-        kb_send_key_gamepad_control(6, true);
-        break;
-  }
-   
-   return; }
-}
-
-
-
+//STAR GAMEPAD
+uint32_t last_button_check = 0; 
+//END GAMEPAD
 
 void tuh_kb_set_leds(u8 leds) {
   if(kb_addr) {
@@ -225,183 +174,6 @@ void tuh_hid_report_received_cb(u8 dev_addr, u8 instance, u8 const* report, u16 
   }
 }
 
-bool is_button_pressed(uint pin) {
-    static uint64_t last_press_time[5] = {0};  // Marca de tiempo de los botones
-    static bool last_state[5] = {true, true, true, true, true};  // Estado anterior de los botones (asumido como no presionado)
-    uint64_t current_time = time_us_64();  // Tiempo actual en microsegundos
-    int button_index = -1;
-
-    // Mapeo de pines a índices
-    switch(pin) {
-        case GAMEPAD_UP:
-            button_index = 0;
-            break;
-        case GAMEPAD_DOWN:
-            button_index = 1;
-            break;
-        case GAMEPAD_LEFT:
-            button_index = 2;
-            break;
-        case GAMEPAD_RIGHT:
-            button_index = 3;
-            break;
-        case GAMEPAD_FIRE:
-            button_index = 4;
-            break;
-        default:
-            return false;  // Pin desconocido
-    }
-
-    // Verificar si el botón está presionado (activa bajo)
-    bool current_state = gpio_get(pin) == 0;
-
-    // Si el estado ha cambiado y ha pasado el tiempo de debounce
-    if (current_state != last_state[button_index] && (current_time - last_press_time[button_index]) > 100000) {
-        last_press_time[button_index] = current_time;
-        last_state[button_index] = current_state;
-        return true;  // El estado ha cambiado
-    }
-    return false;  // El estado no ha cambiado
-}
-#define ESP_JOY1LEFT 0x40
-#define ESP_JOY1RIGHT 0x41
-#define ESP_JOY1UP 0x42
-#define ESP_JOY1DOWN 0x43
-#define ESP_JOY1START 0x44
-#define ESP_JOY1MODE 0x45
-#define ESP_JOY1A 0x46
-#define ESP_JOY1B 0x47
-#define ESP_JOY1C 0x48
-#define ESP_JOY1X 0x49
-#define ESP_JOY1Y 0x4a
-#define ESP_JOY1Z 0x4b
-#define SLEEP_TIME 25
-#define SCAN_CODE_SET_F0 0xf0
-#define SCAN_CODE_SET_E2 0xe2
-
-void send_joy_action(u8 scancode, bool press) {
-    printf("***** KEYBOARD CONTROL\n");
-    kb_send(SCAN_CODE_SET_E2);
-    sleep_ms(SLEEP_TIME);
-    printf("----> KEY PRESSED: %s\n", press ? "TRUE" : "FALSE");
-    if (!press) {
-        kb_send(SCAN_CODE_SET_F0);
-        sleep_ms(SLEEP_TIME);
-    }
-    kb_send(scancode);
-    sleep_ms(SLEEP_TIME);
-    printf("**********************\n");
-}
-
-// int main() {
-//     board_init();
-//     printf("\n%s-%s\n", PICO_PROGRAM_NAME, PICO_PROGRAM_VERSION_STRING);
-
-//     gpio_init(LVOUT);
-//     gpio_init(LVIN);
-//     gpio_set_dir(LVOUT, GPIO_OUT);
-//     gpio_set_dir(LVIN, GPIO_OUT);
-//     gpio_put(LVOUT, 1);
-//     gpio_put(LVIN, 1);
-    
-//     tusb_init();
-//     kb_init(KBOUT, KBIN);
-//     ms_init(MSOUT, MSIN);
-
-
-//     gpio_init(GAMEPAD_UP);
-//     gpio_init(GAMEPAD_DOWN);
-//     gpio_init(GAMEPAD_LEFT); 
-//     gpio_init(GAMEPAD_RIGHT);
-//     gpio_init(GAMEPAD_FIRE); 
-//     gpio_set_dir(GAMEPAD_UP, GPIO_IN);
-//     gpio_set_dir(GAMEPAD_DOWN, GPIO_IN);
-//     gpio_set_dir(GAMEPAD_LEFT, GPIO_IN);
-//     gpio_set_dir(GAMEPAD_RIGHT, GPIO_IN);
-//     gpio_set_dir(GAMEPAD_FIRE, GPIO_IN);
-
-//     gpio_pull_up(GAMEPAD_UP);
-//     gpio_pull_up(GAMEPAD_DOWN);
-//     gpio_pull_up(GAMEPAD_LEFT);
-//     gpio_pull_up(GAMEPAD_RIGHT);
-//     gpio_pull_up(GAMEPAD_FIRE);
-
-//     while (1) {
-//         tuh_task();
-//         kb_task();
-//         ms_task();
-//   // button_t *Joy1Up = create_button(joy1Up, onchange);
-//   // button_t *Joy1Down = create_button(joy1Down, onchange);
-//   // button_t *Joy1Left = create_button(joy1Left, onchange);
-//   // button_t *Joy1Right = create_button(joy1Right, onchange);
-//   // button_t *Joy1Fire = create_button(joy1Fire, onchange);
-//             // // Configuración del botón de prueba
-//     bool current_state = !gpio_get(GAMEPAD_UP);
-//     static bool button_pressed = false;
-
-//     if (current_state && !button_pressed) {
-//         button_pressed = true;
-//         send_joy_action(ESP_JOY1UP, true);
-//     } else if (!current_state && button_pressed) {
-//         button_pressed = false;
-//         send_joy_action(ESP_JOY1UP, false);
-//     }
-//         // if (is_button_pressed(GAMEPAD_UP)) {
-//         //     if (gpio_get(GAMEPAD_UP) == 0) {
-//         //         kb_send_key_gamepad_control(2, true);
-//         //     }
-//         // }else{
-//         //      if (gpio_get(GAMEPAD_UP) == 0) {
-//         //       kb_send_key_gamepad_control(2, false);
-//         //     }         
-//         // }
-
-//         // if (is_button_pressed(GAMEPAD_DOWN)) {
-//         //     if (gpio_get(GAMEPAD_DOWN) == 0) {
-//         //       kb_send_key_gamepad_control(3, true);
-//         //     } else {
-//         //       kb_send_key_gamepad_control(3, false);
-//         //     }
-//         // }
-
-//         // if (is_button_pressed(GAMEPAD_LEFT)) {
-//         //     if (gpio_get(GAMEPAD_LEFT) == 0) {
-//         //       kb_send_key_gamepad_control(0, true);
-//         //     } else {
-//         //       kb_send_key_gamepad_control(0, false);
-//         //     }
-//         // }
-
-//         // if (is_button_pressed(GAMEPAD_RIGHT)) {
-//         //     if (gpio_get(GAMEPAD_RIGHT) == 0) {
-//         //         kb_send_key_gamepad_control(1, true);
-//         //     } else {
-//         //       kb_send_key_gamepad_control(1, false);
-//         //     }
-//         // }
-
-//         // if (is_button_pressed(GAMEPAD_FIRE)) {
-//         //     if (gpio_get(GAMEPAD_FIRE) == 0) {
-//         //       kb_send_key_gamepad_control(6, true);
-//         //     } else {
-//         //       kb_send_key_gamepad_control(6, false);
-//         //     }
-//         // }
-
-//     }
-    
-//     return 0;
-// }
-uint32_t last_button_check = 0;  // Última vez que se verificó el botón
-// #define DEBOUNCE_TIME 50
-
-
-// // Estados de los botones
-// bool button1_state = false;
-// bool button1_prev_state = false;
-// bool button2_state = false;
-// bool button2_prev_state = false;
-
 void setup() {
     gpio_init(GAMEPAD_LEFT);
     gpio_set_dir(GAMEPAD_LEFT, GPIO_IN);
@@ -424,37 +196,6 @@ void setup() {
     gpio_pull_up(GAMEPAD_FIRE);
 }
 
-// void debounce_delay() {
-//     sleep_ms(20);
-// }
-
-// void check_buttons() {
-//     // Leer los estados actuales
-//     button1_state = !gpio_get(GAMEPAD_LEFT);
-//     button2_state = !gpio_get(GAMEPAD_RIGHT);
-
-//     // Detectar eventos de botón 1
-//     if (button1_state && !button1_prev_state) {
-//         printf("Button left Pressed\n");
-//     }
-//     if (!button1_state && button1_prev_state) {
-//         printf("Button left Released\n");
-//     }
-
-//     // Detectar eventos de botón 2
-//     if (button2_state && !button2_prev_state) {
-//         printf("Button right Pressed\n");
-//     }
-//     if (!button2_state && button2_prev_state) {
-//         printf("Button right Released\n");
-//     }
-
-//     // Actualizar los estados anteriores
-//     button1_prev_state = button1_state;
-//     button2_prev_state = button2_state;
-
-//     debounce_delay();
-// }
 
 void main() {
     board_init();
@@ -472,50 +213,19 @@ void main() {
     ms_init(MSOUT, MSIN);
 
     setup();
-
-  // board_init();
-  // printf("\n%s-%s\n", PICO_PROGRAM_NAME, PICO_PROGRAM_VERSION_STRING);
-
-  // gpio_init(LVOUT);
-  // gpio_init(LVIN);
-
-  // // // ADD - DESTROYER
-  // printf("Waiting for ESPectrum...\n");
-  //   // Configurar pines como entradas con pull-ups
-  //   // const uint BUTTON_PINS[] = {GAMEPAD_UP, GAMEPAD_DOWN, GAMEPAD_LEFT, GAMEPAD_RIGHT, GAMEPAD_FIRE};
-  //   // for (int i = 0; i < 5; i++) {
-  //   //     gpio_init(BUTTON_PINS[i]);
-  //   //     gpio_set_dir(BUTTON_PINS[i], GPIO_IN);
-  //   //     gpio_pull_up(BUTTON_PINS[i]);
-  //   // }
-  // // // END - DESTROYER
-
-  // gpio_set_dir(LVOUT, GPIO_OUT);
-  // gpio_set_dir(LVIN, GPIO_OUT);
-  // gpio_put(LVOUT, 1);
-  // gpio_put(LVIN, 1);
   
-  // tusb_init();
-  // kb_init(KBOUT, KBIN);
-  // ms_init(MSOUT, MSIN);
-  
-
     while (1) {
-
-        
         tuh_task();
         kb_task();
         ms_task();
-
         // ADD -> DESTROYER
-        uint32_t current_time = time_us_32();  // Obtener tiempo actual en microsegundos
-        if (current_time - last_button_check >= DEBOUNCE_TIME * 1000) {
-            
-            check_buttons();
-            last_button_check = current_time;  // Actualiza la última verificación
-            
-        }
+        // uint32_t current_time = time_us_32();  // Obtener tiempo actual en microsegundos
+        // if (current_time - last_button_check >= DEBOUNCE_TIME * 1000) {
+        //     
+        //     last_button_check = current_time;  // Actualiza la última verificación
+        // }
         //END - DESTROYER
+        gamepad_controls();
     }
     
 }
