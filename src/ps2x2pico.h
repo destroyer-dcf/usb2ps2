@@ -49,7 +49,7 @@ void kb_set_defaults();
 void ms_init(u8 gpio_out, u8 gpio_in);
 void ms_usb_receive(u8 const* report);
 bool ms_task();
-
+void check_buttons();
 // ADD -> DESTROYER
 // void kb_send_key_gamepad_control(u8 key, bool is_key_pressed)
 // Prototipos

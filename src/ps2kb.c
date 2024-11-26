@@ -106,6 +106,7 @@ bool button_pressed_fire = false;  // Estado del botón
 #define ESP_JOY1START 0x44
 #define ESP_JOY1MODE 0x45
 #define ESP_JOY1A 0x46
+#define ESP_JOYFIRE 0x46
 #define ESP_JOY1B 0x47
 #define ESP_JOY1C 0x48
 #define ESP_JOY1X 0x49
@@ -385,46 +386,7 @@ void kb_send_key_scs3(u8 key, bool is_key_pressed) {
     }
   }
 }
-// ************************
-// GAMEPAD CONTROL
-// ************************
 
-#define SCAN_CODE_SET_F0 0xf0
-#define SCAN_CODE_SET_E2 0xe2
-
-void kb_send_key_gamepad_control(u8 key, bool is_key_pressed) {
-  printf("***** GAMEPAD CONTROL\n");
-  printf("----> KEY VALUE: %u\n", key);
-  u8 scan_code = gamepad_scancodes[key];
-  kb_send(SCAN_CODE_SET_E2);   
-  if (is_key_pressed) {
-    printf("----> KEY PRESET: TRUE\n");
-    // key2repeat = key;
-    // if(repeater) cancel_alarm(repeater);
-    // repeater = add_alarm_in_ms(delay_ms, repeat_cb, NULL, false);
-    kb_send(scan_code);
-  } else {
-    printf("----> KEY PRESET: FALSE\n");
-    // if(key == key2repeat) key2repeat = 0;
-    kb_send(KB_BREAK_2_3);
-  }
-  kb_send(scan_code);
-}
-#define SLEEP_TIME 25
-
-void sendGamePad(u8 scancode, bool press) {
-    printf("***** KEYBOARD CONTROL\n");
-    kb_send(SCAN_CODE_SET_E2);
-    sleep_ms(SLEEP_TIME);
-    printf("----> KEY PRESSED: %s\n", press ? "TRUE" : "FALSE");
-    if (!press) {
-        kb_send(KB_BREAK_2_3);
-        sleep_ms(SLEEP_TIME);
-    }
-    kb_send(scancode);
-    sleep_ms(SLEEP_TIME);
-    printf("**********************\n");
-}
 
 // Sends a key state change to the host
 // u8 keycode          - from hid.h HID_KEY_ definition
@@ -751,9 +713,132 @@ void kb_receive(u8 byte, u8 prev_byte) {
   kb_send(KB_MSG_ACK_FA);
 }
 
+// Estados de los botones
+bool gamepad_left_state = false;
+bool gamepad_left_prev_state = false;
+bool gamepad_right_state = false;
+bool gamepad_right_prev_state = false;
+bool gamepad_up_state = false;
+bool gamepad_up_prev_state = false;
+bool gamepad_down_state = false;
+bool gamepad_down_prev_state = false;
+bool gamepad_fire_state = false;
+bool gamepad_fire_prev_state = false;
+
+// ************************
+// GAMEPAD CONTROL
+// ************************
+
+#define SCAN_CODE_SET_F0 0xf0
+#define SCAN_CODE_SET_E2 0xe2
+
+void kb_send_key_gamepad_control(u8 key, bool is_key_pressed) {
+  printf("***** GAMEPAD CONTROL\n");
+  printf("----> KEY VALUE: %u\n", key);
+  u8 scan_code = gamepad_scancodes[key];
+  kb_send(SCAN_CODE_SET_E2);   
+  if (is_key_pressed) {
+    printf("----> KEY PRESET: TRUE\n");
+    // key2repeat = key;
+    // if(repeater) cancel_alarm(repeater);
+    // repeater = add_alarm_in_ms(delay_ms, repeat_cb, NULL, false);
+    kb_send(scan_code);
+  } else {
+    printf("----> KEY PRESET: FALSE\n");
+    // if(key == key2repeat) key2repeat = 0;
+    kb_send(KB_BREAK_2_3);
+  }
+  kb_send(scan_code);
+}
+#define SLEEP_TIME 25
+
+void sendGamePad(u8 scancode, bool press) {
+    printf("***** KEYBOARD CONTROL\n");
+    kb_send(SCAN_CODE_SET_E2);
+    sleep_ms(SLEEP_TIME);
+    printf("----> KEY PRESSED: %s\n", press ? "TRUE" : "FALSE");
+    if (!press) {
+        kb_send(KB_BREAK_2_3);
+        sleep_ms(SLEEP_TIME);
+    }
+    kb_send(scancode);
+    sleep_ms(SLEEP_TIME);
+    printf("**********************\n");
+}
+
+void debounce_delay() {
+    sleep_ms(1);
+}
+
+// #define ESP_JOY1LEFT 0x40
+// #define ESP_JOY1RIGHT 0x41
+
+// #define ESP_JOY1UP 0x42
+// #define ESP_JOY1DOWN 0x43
+// #define ESP_JOY1START 0x44
+// #define ESP_JOY1MODE 0x45
+// #define ESP_JOY1FIRE 0x46
+
+void check_buttons() {
+    // Leer los estados actuales
+    gamepad_left_state  = !gpio_get(GAMEPAD_LEFT);
+    gamepad_right_state = !gpio_get(GAMEPAD_RIGHT);
+    gamepad_up_state    = !gpio_get(GAMEPAD_UP);
+    gamepad_down_state  = !gpio_get(GAMEPAD_DOWN);
+    gamepad_fire_state  = !gpio_get(GAMEPAD_FIRE);
+
+    // LEFT CONTROL ******
+    if (gamepad_left_state && !gamepad_left_prev_state) {
+        sendGamePad(ESP_JOY1LEFT,true);
+    }
+    if (!gamepad_left_state && gamepad_left_prev_state) {
+        sendGamePad(ESP_JOY1LEFT,false);
+    }
+
+    // RIGHT CONTROL ******
+    if (gamepad_right_state && !gamepad_right_prev_state) {
+        sendGamePad(ESP_JOY1RIGHT,true);
+    }
+    if (!gamepad_right_state && gamepad_right_prev_state) {
+        sendGamePad(ESP_JOY1RIGHT,false);
+    }
+
+    // UP CONTROL ******
+    if (gamepad_up_state && !gamepad_up_prev_state) {
+        sendGamePad(ESP_JOY1UP,true);
+    }
+    if (!gamepad_up_state && gamepad_up_prev_state) {
+        sendGamePad(ESP_JOY1UP,false);
+    }
+
+    // DOWN CONTROL ******
+    if (gamepad_down_state && !gamepad_down_prev_state) {
+        sendGamePad(ESP_JOY1DOWN,true);
+    }
+    if (!gamepad_down_state && gamepad_down_prev_state) {
+        sendGamePad(ESP_JOY1DOWN,false);
+    }
+
+    // FIRE CONTROL ******
+    if (gamepad_fire_state && !gamepad_fire_prev_state) {
+        sendGamePad(ESP_JOYFIRE,true);
+    }
+    if (!gamepad_fire_state && gamepad_fire_prev_state) {
+        sendGamePad(ESP_JOYFIRE,false);
+    }
+
+    gamepad_left_prev_state = gamepad_left_state;
+    gamepad_right_prev_state = gamepad_right_state;
+    gamepad_up_prev_state = gamepad_up_state;
+    gamepad_down_prev_state = gamepad_down_state;
+    gamepad_fire_prev_state = gamepad_fire_state;
+}
+
+
 bool kb_task() {
   ps2out_task(&kb_out);
   ps2in_task(&kb_in, &kb_out);
+  
   return kb_enabled && !kb_out.busy;// TODO: return value can probably be void
 }
 
