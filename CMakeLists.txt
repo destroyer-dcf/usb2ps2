@@ -23,7 +23,7 @@ project(usb2ps2 C CXX ASM)
 pico_sdk_init()
 
 add_compile_definitions(PICO_DEFAULT_LED_PIN=25) 
-add_executable(usb2ps2 src/ps2x2pico.c src/scancodesets.c src/ps2kb.c src/ps2ms.c src/ps2out.c src/ps2in.c)
+add_executable(usb2ps2 src/ps2x2pico.c src/scancodesets.c src/ps2kb.c src/ps2ms.c src/ps2out.c src/ps2in.c src/ps2pad.c)
 
 pico_generate_pio_header(usb2ps2 ${CMAKE_CURRENT_LIST_DIR}/src/ps2out.pio)
 pico_generate_pio_header(usb2ps2 ${CMAKE_CURRENT_LIST_DIR}/src/ps2in.pio)
@@ -35,7 +35,7 @@ add_compile_definitions(GAMEPAD_DOWN=3)
 add_compile_definitions(GAMEPAD_LEFT=4) 
 add_compile_definitions(GAMEPAD_RIGHT=5) 
 add_compile_definitions(GAMEPAD_FIRE=6) 
-add_compile_definitions(DEBOUNCE_TIME=100) # tiempo de rebote
+add_compile_definitions(DEBOUNCE_TIME=25) # tiempo de rebote
 
 ### PS/2 output
 add_compile_definitions(LVOUT=13) # Level shifter pull-up voltage

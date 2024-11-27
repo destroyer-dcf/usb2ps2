@@ -34,13 +34,6 @@
 #include "tusb.h"
 #include "ps2x2pico.h"
 
-
-#define joy1Up 2 
-#define joy1Down 3
-#define joy1Left 4 
-#define joy1Right 5 
-#define joy1Fire 6 
-
 static void print_utf16(uint16_t *temp_buf, size_t buf_len);
 void print_device_descriptor(tuh_xfer_t* xfer);
 
@@ -219,13 +212,13 @@ void main() {
         kb_task();
         ms_task();
         // ADD -> DESTROYER
-        // uint32_t current_time = time_us_32();  // Obtener tiempo actual en microsegundos
-        // if (current_time - last_button_check >= DEBOUNCE_TIME * 1000) {
-        //     
-        //     last_button_check = current_time;  // Actualiza la última verificación
-        // }
+        uint32_t current_time = time_us_32();  // Obtener tiempo actual en microsegundos
+        if (current_time - last_button_check >= DEBOUNCE_TIME * 1000) {
+            gamepad_controls();
+            last_button_check = current_time;  // Actualiza la última verificación
+        }
         //END - DESTROYER
-        gamepad_controls();
+        
     }
     
 }

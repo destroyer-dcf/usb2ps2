@@ -35,40 +35,8 @@
 ps2out kb_out;
 ps2in kb_in;
 
-//START GAMEPAD
-
-#define GAMEPAD_UP 2 
-#define GAMEPAD_DOWN 3
-#define GAMEPAD_LEFT 4 
-#define GAMEPAD_RIGHT 5 
-#define GAMEPAD_FIRE 6 
-
-#define ESP_JOY1LEFT 0x40
-#define ESP_JOY1RIGHT 0x41
-#define ESP_JOY1UP 0x42
-#define ESP_JOY1DOWN 0x43
-#define ESP_JOYFIRE 0x46
-
 #define SCAN_CODE_SET_F0 0xf0
 #define SCAN_CODE_SET_E2 0xe2
-
-bool gamepad_left_state = false;
-bool gamepad_left_prev_state = false;
-bool gamepad_right_state = false;
-bool gamepad_right_prev_state = false;
-bool gamepad_up_state = false;
-bool gamepad_up_prev_state = false;
-bool gamepad_down_state = false;
-bool gamepad_down_prev_state = false;
-bool gamepad_fire_state = false;
-bool gamepad_fire_prev_state = false;
-
-#define SCAN_CODE_SET_F0 0xf0
-#define SCAN_CODE_SET_E2 0xe2
-#define SLEEP_TIME 25
-
-//END GAMEPAD
-
 #define KBHOSTCMD_RESET_FF 0xff
 #define KBHOSTCMD_RESEND_FE 0xfe
 #define KBHOSTCMD_SCS3_SET_KEY_MAKE_FD 0xfd
@@ -94,9 +62,6 @@ bool gamepad_fire_prev_state = false;
 #define KB_MSG_ECHO_EE 0xee
 #define KB_MSG_ACK_FA 0xfa
 #define KB_MSG_RESEND_FE 0xfe
-
-
-
 
 typedef enum {
   KBH_STATE_IDLE,
@@ -402,11 +367,11 @@ void kb_send_key(u8 key, bool is_key_pressed, u8 modifiers) {
       printf("----> SCANCODE SET 3\n");
       kb_send_key_scs3(key, is_key_pressed);
       break;
-    case SCAN_CODE_SET_4:
-      printf("----> SCANCODE SET 4\n");
-      kb_send_key_gamepad_control(key, is_key_pressed);
-      //kb_send_key_scs2(key, is_key_pressed, is_ctrl);
-      break;
+    // case SCAN_CODE_SET_4:
+    //   printf("----> SCANCODE SET 4\n");
+    //   kb_send_key_gamepad_control(key, is_key_pressed);
+    //   //kb_send_key_scs2(key, is_key_pressed, is_ctrl);
+    //   break;
     default:
       printf("INTERNAL ERROR! SCAN CODE SET = %u\n", scancodeset);
       break;
@@ -529,10 +494,10 @@ void kb_receive(u8 byte, u8 prev_byte) {
           memchr(scs3keymodemap,0,sizeof(scs3keymodemap));
           set_scancodeset(byte);
           break;
-        case SCAN_CODE_SET_4:
-          printf("Estoy en el 4-1");
-          set_scancodeset(4);
-          break;
+        // case SCAN_CODE_SET_4:
+        //   printf("Estoy en el 4-1");
+        //   set_scancodeset(4);
+        //   break;
         default:
           printf("WARNING: scancodeset requested to set to unknown value %u by host, defaulting to 2\n",byte);
           set_scancodeset(2);
@@ -689,13 +654,21 @@ void kb_receive(u8 byte, u8 prev_byte) {
   kb_send(KB_MSG_ACK_FA);
 }
 
+bool kb_task() {
+  ps2out_task(&kb_out);
+  ps2in_task(&kb_in, &kb_out);
+  
+  return kb_enabled && !kb_out.busy;// TODO: return value can probably be void
+}
 
-
-// ************************
-// GAMEPAD CONTROL
-// ************************
-
-
+void kb_init(u8 gpio_out, u8 gpio_in) {
+  printf("GPIO OUT %02x\n", gpio_out);
+  printf("GPIO IN %02x\n", gpio_in);
+  ps2out_init(&kb_out, pio0, gpio_out, &kb_receive);
+  ps2in_init(&kb_in, pio1, gpio_in);
+  kb_set_defaults();
+  kb_send(KB_MSG_SELFTEST_PASSED_AA);
+}
 
 void kb_send_key_gamepad_control(u8 key, bool is_key_pressed) {
   printf("***** GAMEPAD CONTROL\n");
@@ -714,92 +687,4 @@ void kb_send_key_gamepad_control(u8 key, bool is_key_pressed) {
     kb_send(KB_BREAK_2_3);
   }
   kb_send(scan_code);
-}
-
-
-void sendGamePad(u8 scancode, bool press) {
-    printf("***** GAMEPAD CONTROL\n");
-    kb_send(SCAN_CODE_SET_E2);
-    sleep_ms(SLEEP_TIME);
-    printf("----> GAMEPAD PRESSED: %s\n", press ? "TRUE" : "FALSE");
-    if (!press) {
-        kb_send(KB_BREAK_2_3);
-        sleep_ms(SLEEP_TIME);
-    }
-    kb_send(scancode);
-    sleep_ms(SLEEP_TIME);
-    printf("**********************\n");
-}
-
-
-void gamepad_controls() {
-    
-    gamepad_left_state  = !gpio_get(GAMEPAD_LEFT);
-    gamepad_right_state = !gpio_get(GAMEPAD_RIGHT);
-    gamepad_up_state    = !gpio_get(GAMEPAD_UP);
-    gamepad_down_state  = !gpio_get(GAMEPAD_DOWN);
-    gamepad_fire_state  = !gpio_get(GAMEPAD_FIRE);
-
-    // LEFT CONTROL ******
-    if (gamepad_left_state && !gamepad_left_prev_state) {
-        sendGamePad(ESP_JOY1LEFT,true);
-    }
-    if (!gamepad_left_state && gamepad_left_prev_state) {
-        sendGamePad(ESP_JOY1LEFT,false);
-    }
-
-    // RIGHT CONTROL ******
-    if (gamepad_right_state && !gamepad_right_prev_state) {
-        sendGamePad(ESP_JOY1RIGHT,true);
-    }
-    if (!gamepad_right_state && gamepad_right_prev_state) {
-        sendGamePad(ESP_JOY1RIGHT,false);
-    }
-
-    // UP CONTROL ******
-    if (gamepad_up_state && !gamepad_up_prev_state) {
-        sendGamePad(ESP_JOY1UP,true);
-    }
-    if (!gamepad_up_state && gamepad_up_prev_state) {
-        sendGamePad(ESP_JOY1UP,false);
-    }
-
-    // DOWN CONTROL ******
-    if (gamepad_down_state && !gamepad_down_prev_state) {
-        sendGamePad(ESP_JOY1DOWN,true);
-    }
-    if (!gamepad_down_state && gamepad_down_prev_state) {
-        sendGamePad(ESP_JOY1DOWN,false);
-    }
-
-    // FIRE CONTROL ******
-    if (gamepad_fire_state && !gamepad_fire_prev_state) {
-        sendGamePad(ESP_JOYFIRE,true);
-    }
-    if (!gamepad_fire_state && gamepad_fire_prev_state) {
-        sendGamePad(ESP_JOYFIRE,false);
-    }
-
-    gamepad_left_prev_state = gamepad_left_state;
-    gamepad_right_prev_state = gamepad_right_state;
-    gamepad_up_prev_state = gamepad_up_state;
-    gamepad_down_prev_state = gamepad_down_state;
-    gamepad_fire_prev_state = gamepad_fire_state;
-}
-
-
-bool kb_task() {
-  ps2out_task(&kb_out);
-  ps2in_task(&kb_in, &kb_out);
-  
-  return kb_enabled && !kb_out.busy;// TODO: return value can probably be void
-}
-
-void kb_init(u8 gpio_out, u8 gpio_in) {
-  printf("GPIO OUT %02x\n", gpio_out);
-  printf("GPIO IN %02x\n", gpio_in);
-  ps2out_init(&kb_out, pio0, gpio_out, &kb_receive);
-  ps2in_init(&kb_in, pio1, gpio_in);
-  kb_set_defaults();
-  kb_send(KB_MSG_SELFTEST_PASSED_AA);
 }
