@@ -208,16 +208,16 @@ void main() {
     setup();
   
     while (1) {
+
         tuh_task();
         kb_task();
         ms_task();
-        // ADD -> DESTROYER
+
         uint32_t current_time = time_us_32();  // Obtener tiempo actual en microsegundos
         if (current_time - last_button_check >= DEBOUNCE_TIME * 1000) {
             gamepad_controls();
             last_button_check = current_time;  // Actualiza la última verificación
         }
-        //END - DESTROYER
         
     }
     
