@@ -2,9 +2,13 @@
 Convertidor de teclado USB a PS/2 con una placa RP2040 Zero.
 Este proyecto es un fork de https://github.com/No0ne/ps2x2pico pensado como adaptacion para mi [ESPectrum](https://github.com/EremusOne/ESPectrum)
 
-## Version 1.0
- 
- * Soporte Teclado USB
+## Version 1.1 (Keyboard and Mouse Support)
+
+
+
+## Version 1.0 (Keyboard Support)
+
+
 
 |![hw1](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/FOTO0.jpg) |![hw2](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/FOTO1.jpg) |
 |-|-|
