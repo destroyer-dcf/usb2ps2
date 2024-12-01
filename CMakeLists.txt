@@ -22,7 +22,7 @@ project(usb2ps2 C CXX ASM)
 
 pico_sdk_init()
 
-add_compile_definitions(PICO_DEFAULT_LED_PIN=25) 
+add_compile_definitions(PICO_DEFAULT_LED_PIN=10)
 add_executable(usb2ps2 src/ps2x2pico.c src/scancodesets.c src/ps2kb.c src/ps2ms.c src/ps2out.c src/ps2in.c src/ps2pad.c)
 
 pico_generate_pio_header(usb2ps2 ${CMAKE_CURRENT_LIST_DIR}/src/ps2out.pio)
