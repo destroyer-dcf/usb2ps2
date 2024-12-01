@@ -153,7 +153,7 @@ Soldaremos un cable al pin **HV3** y otro al **HV4** y los conectaremos al puert
 
 **El software de la versión 1.0 soporta mouse.**
 
-![hw1](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/mouse_fix_1.jpg) |![hw2](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/mouse_fix_2.jpg) |
+![hw1](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/mouse_fix_1.jpg)|
 
 # Instalar
 * Descargar  `usb2ps2.uf2` from https://github.com/destroyer-dcf/usb2ps2/releases/tag/1.0
