@@ -53,6 +53,30 @@ Se han de hacer 2 conectores, uno para raton y otro para el teclado.
 * Conecta tu teclado/raton al usbc de la placa
 * Si tu teclado/raton es reconocido el led (opcional) se encendera.
 
+# Compilar
+
+Para poder compilar es necesario tener descargado el [SDK de raspberry pico](https://github.com/raspberrypi/pico-sdk)
+
+Una vez descargado es necesario actualizar la libreria TinyUSB al tag 0.16.0 para ello ..
+
+```
+export PICO_SDK_PATH=/path/to/pico-sdk
+cd $PICO_SDK_PATH/lib/tinyusb
+git checkout 0.16.0
+```
+
+Despues desde el directorio de nuestro proyecto
+
+```
+cd /path/to/usb2ps2
+mkdir build
+cd build
+cmake ..
+make
+```
+
+Si lo prefieres puedes ejecutar el script `compile.sh` cambiando la linea  `export PICO_SDK_PATH=~/pico-sdk` por tu path de pico-sdk
+
 
 ## Version 1.0 (Only Keyboard Support) (04/08/2024)
 
