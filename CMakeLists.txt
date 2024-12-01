@@ -55,7 +55,7 @@ if (MS_RATE_HOST_CONTROL)
 endif()
 
 pico_set_program_name(usb2ps2 "usb2ps2")
-pico_set_program_version(usb2ps2 "1.2")
+pico_set_program_version(usb2ps2 "1.1")
 
 pico_enable_stdio_uart(usb2ps2 1)
 pico_enable_stdio_usb(usb2ps2 0)
