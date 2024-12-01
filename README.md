@@ -120,22 +120,38 @@ Si lo prefieres puedes ejecutar el script `compile.sh` cambiando la linea  `expo
 | 2    | Sin Uso| Sin Uso  |
 | 6    | Sin Uso| Sin Uso |
 
-```diff
+<!-- ```diff
 - text in yellow
 + text in green
 ! text in orange
 # text in gray
 @@ text in purple (and bold)@@
-```
-$${\color{red}Welcome \space \color{lightblue}To \space \color{orange}Stackoverflow}$$
-<font color="Yellow"><b>INFO: Esta placa no tiene soporte para raton. Si le queremos añadir seguiremos estos pasos, Si no la version 1.1 de la placa ya lo tiene.</b></font>
+``` -->
 
-Para añadir soporte para raton, bastara con que soldemos dos cables uno al pin HV3 y otro al HV4
+## $\textsf{\color{#f48522}{INFO: Esta placa no tiene soporte para raton}}$
+
+Si queremos añadir soporte para raton a la version 1.0 de la placa seguiremos los siguientes pasos.
+
+
+<!-- MARKDOWN THEME -->
+<!-- # $\textsf{\color{#f5750e}{f5750e}}$ -->
+
+
+
+<!-- ### $\textsf{\color{#326a95}{326a95}}$
+
+#### $\textsf{\color{#18afd3}{18afd3}}$
+
+##### $\textsf{\color{#5ec3d5}{5ec3d5}}$ -->
+
+Soldaremos un cable al pin **HV3** y otro al **HV4** y los conectaremos al puerto PS/2 del Mouse en la lilygo
 
 | Pin | Color| PS/2 |
 |----------|----------|----------|
 | HV3    | Amarillo   | CLK  |
 | HV4    | VERDE   | DATA  |
+
+**El software de la versión 1.0 soporta mouse.**
 
 ![hw1](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/mouse_fix_1.jpg) |![hw2](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/mouse_fix_2.jpg) |
 
