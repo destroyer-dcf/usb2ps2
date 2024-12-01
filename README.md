@@ -7,7 +7,7 @@ Este proyecto es un fork de https://github.com/No0ne/ps2x2pico pensado como adap
 
 |![hw1](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/pcb1.1-A.jpg) |![hw2](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/pcb1.1-B.jpg) |
 |-|-|
-|![hw1](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/FOTO3.jpg) |![hw2](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/FOTO4.jpg) |
+|![hw1](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/pcb1.1-D.jpg) |![hw2](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/pcb1.1-E.jpg) |
 
 
 # Circuito
