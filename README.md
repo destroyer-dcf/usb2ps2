@@ -149,7 +149,7 @@ Soldaremos un cable al pin **HV3** y otro al **HV4** y los conectaremos al puert
 | Pin | Color| PS/2 |
 |----------|----------|----------|
 | HV3    | Amarillo   | CLK  |
-| HV4    | VERDE   | DATA  |
+| HV4    | Verde   | DATA  |
 
 **El software de la versión 1.0 soporta mouse.**
 
