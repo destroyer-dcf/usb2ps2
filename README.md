@@ -48,17 +48,6 @@ Se han de hacer 2 conectores, uno para raton y otro para el teclado.
 | 6    | Sin Uso| Sin Uso |
 
 
-<font color="Yellow"><b>INFO: Esta placa no tiene soporte para raton. Si le queremos añadir seguiremos estos pasos, Si no la version 1.1 de la placa ya lo tiene.</b></font>
-
-Para añadir soporte para raton, bastara con que soldemos dos cables uno al pin HV3 y otro al HV4
-
-| Pin | Color| PS/2 |
-|----------|----------|----------|
-| HV3    | Amarillo   | CLK  |
-| HV4    | VERDE   | DATA  |
-
-|![hw1](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/mouse_fix_1.jpg) |![hw2](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/mouse_fix_2.jpg) |
-
 # Instalar
 * Descargar  `usb2ps2.uf2` from https://github.com/destroyer-dcf/usb2ps2/releases/tag/1.1
 * Copie `usb2ps2.uf2` a su RP2040 presionando BOOT antes de enchufarlo.
@@ -131,6 +120,24 @@ Si lo prefieres puedes ejecutar el script `compile.sh` cambiando la linea  `expo
 | 2    | Sin Uso| Sin Uso  |
 | 6    | Sin Uso| Sin Uso |
 
+```diff
+- text in yellow
++ text in green
+! text in orange
+# text in gray
+@@ text in purple (and bold)@@
+```
+$${\color{red}Welcome \space \color{lightblue}To \space \color{orange}Stackoverflow}$$
+<font color="Yellow"><b>INFO: Esta placa no tiene soporte para raton. Si le queremos añadir seguiremos estos pasos, Si no la version 1.1 de la placa ya lo tiene.</b></font>
+
+Para añadir soporte para raton, bastara con que soldemos dos cables uno al pin HV3 y otro al HV4
+
+| Pin | Color| PS/2 |
+|----------|----------|----------|
+| HV3    | Amarillo   | CLK  |
+| HV4    | VERDE   | DATA  |
+
+![hw1](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/mouse_fix_1.jpg) |![hw2](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/mouse_fix_2.jpg) |
 
 # Instalar
 * Descargar  `usb2ps2.uf2` from https://github.com/destroyer-dcf/usb2ps2/releases/tag/1.0
