@@ -5,6 +5,7 @@ Este proyecto es un fork de https://github.com/No0ne/ps2x2pico pensado como adap
 
 ## Version 1.1 (Keyboard and Mouse Support) (30/11/2024)
 
+
 |![hw1](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/pcb1.1-A.jpg) |![hw2](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/pcb1.1-B.jpg) |
 |-|-|
 |![hw1](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/pcb1.1-D.jpg) |![hw2](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/pcb1.1-E.jpg) |
@@ -46,6 +47,17 @@ Se han de hacer 2 conectores, uno para raton y otro para el teclado.
 | 2    | Sin Uso| Sin Uso  |
 | 6    | Sin Uso| Sin Uso |
 
+
+<font color="Yellow"><b>INFO: Esta placa no tiene soporte para raton. Si le queremos añadir seguiremos estos pasos, Si no la version 1.1 de la placa ya lo tiene.</b></font>
+
+Para añadir soporte para raton, bastara con que soldemos dos cables uno al pin HV3 y otro al HV4
+
+| Pin | Color| PS/2 |
+|----------|----------|----------|
+| HV3    | Amarillo   | CLK  |
+| HV4    | VERDE   | DATA  |
+
+|![hw1](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/mouse_fix_1.jpg) |![hw2](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/mouse_fix_2.jpg) |
 
 # Instalar
 * Descargar  `usb2ps2.uf2` from https://github.com/destroyer-dcf/usb2ps2/releases/tag/1.1
