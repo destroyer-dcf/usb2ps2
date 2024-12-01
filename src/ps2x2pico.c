@@ -27,7 +27,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-
+// #include "hardware/i2c.h"
 #include "hardware/watchdog.h"
 #include "hardware/gpio.h"
 #include "bsp/board_api.h"
@@ -39,10 +39,13 @@ void print_device_descriptor(tuh_xfer_t* xfer);
 
 u8 kb_addr = 0;
 u8 kb_inst = 0;
-u8 kb_leds = 0;
+u8 kb_leds = 0;  
 char device_str[50];
 char manufacturer_str[50];
 
+//STAR GAMEPAD
+uint32_t last_button_check = 0; 
+//END GAMEPAD
 
 void tuh_kb_set_leds(u8 leds) {
   if(kb_addr) {
@@ -164,26 +167,60 @@ void tuh_hid_report_received_cb(u8 dev_addr, u8 instance, u8 const* report, u16 
   }
 }
 
+void setup() {
+    gpio_init(GAMEPAD_LEFT);
+    gpio_set_dir(GAMEPAD_LEFT, GPIO_IN);
+    gpio_pull_up(GAMEPAD_LEFT);
+
+    gpio_init(GAMEPAD_RIGHT);
+    gpio_set_dir(GAMEPAD_RIGHT, GPIO_IN);
+    gpio_pull_up(GAMEPAD_RIGHT);
+
+    gpio_init(GAMEPAD_UP);
+    gpio_set_dir(GAMEPAD_UP, GPIO_IN);
+    gpio_pull_up(GAMEPAD_UP);
+
+    gpio_init(GAMEPAD_DOWN);
+    gpio_set_dir(GAMEPAD_DOWN, GPIO_IN);
+    gpio_pull_up(GAMEPAD_DOWN);
+
+    gpio_init(GAMEPAD_FIRE);
+    gpio_set_dir(GAMEPAD_FIRE, GPIO_IN);
+    gpio_pull_up(GAMEPAD_FIRE);
+}
+
+
 void main() {
-  board_init();
-  printf("\n%s-%s\n", PICO_PROGRAM_NAME, PICO_PROGRAM_VERSION_STRING);
+    board_init();
+    printf("\n%s-%s\n", PICO_PROGRAM_NAME, PICO_PROGRAM_VERSION_STRING);
+
+    gpio_init(LVOUT);
+    gpio_init(LVIN);
+    gpio_set_dir(LVOUT, GPIO_OUT);
+    gpio_set_dir(LVIN, GPIO_OUT);
+    gpio_put(LVOUT, 1);
+    gpio_put(LVIN, 1);
+    
+    tusb_init();
+    kb_init(KBOUT, KBIN);
+    ms_init(MSOUT, MSIN);
+
+    setup();
   
-  gpio_init(LVOUT);
-  gpio_init(LVIN);
-  gpio_set_dir(LVOUT, GPIO_OUT);
-  gpio_set_dir(LVIN, GPIO_OUT);
-  gpio_put(LVOUT, 1);
-  gpio_put(LVIN, 1);
-  
-  tusb_init();
-  kb_init(KBOUT, KBIN);
-  ms_init(MSOUT, MSIN);
-  
-  while(1) {
-    tuh_task();
-    kb_task();
-    ms_task();
-  }
+    while (1) {
+
+        tuh_task();
+        kb_task();
+        ms_task();
+
+        uint32_t current_time = time_us_32();  // Obtener tiempo actual en microsegundos
+        if (current_time - last_button_check >= DEBOUNCE_TIME * 1000) {
+            gamepad_controls();
+            last_button_check = current_time;  // Actualiza la última verificación
+        }
+        
+    }
+    
 }
 
 void reset() {

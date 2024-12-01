@@ -1,10 +1,12 @@
+
 cmake_minimum_required(VERSION 3.13)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 
 # Cambia esta línea para seleccionar la placa deseada
-set(PICO_BOARD waveshare_rp2040_zero CACHE STRING "Board type")
+# set(PICO_BOARD waveshare_rp2040_zero CACHE STRING "Board type")
+set(PICO_BOARD pico CACHE STRING "Board type")
 
 set(MS_RATE_DEFAULT 100 CACHE STRING "Default mouse sample rate")
 set(MS_RATE_HOST_CONTROL ON CACHE BOOL "Allow the host to configure the mouse sample rate")
@@ -20,11 +22,20 @@ project(usb2ps2 C CXX ASM)
 
 pico_sdk_init()
 
-add_compile_definitions(PICO_DEFAULT_LED_PIN=10) 
-add_executable(usb2ps2 src/ps2x2pico.c src/scancodesets.c src/ps2kb.c src/ps2ms.c src/ps2out.c src/ps2in.c)
+add_compile_definitions(PICO_DEFAULT_LED_PIN=10)
+add_executable(usb2ps2 src/ps2x2pico.c src/scancodesets.c src/ps2kb.c src/ps2ms.c src/ps2out.c src/ps2in.c src/ps2pad.c)
 
 pico_generate_pio_header(usb2ps2 ${CMAKE_CURRENT_LIST_DIR}/src/ps2out.pio)
 pico_generate_pio_header(usb2ps2 ${CMAKE_CURRENT_LIST_DIR}/src/ps2in.pio)
+
+### BUTTON GAMEPAD
+add_compile_definitions(BUTTON_TESTING=22) # Button testing
+add_compile_definitions(GAMEPAD_UP=2) 
+add_compile_definitions(GAMEPAD_DOWN=3) 
+add_compile_definitions(GAMEPAD_LEFT=4) 
+add_compile_definitions(GAMEPAD_RIGHT=5) 
+add_compile_definitions(GAMEPAD_FIRE=6) 
+add_compile_definitions(DEBOUNCE_TIME=25) # tiempo de rebote
 
 ### PS/2 output
 add_compile_definitions(LVOUT=13) # Level shifter pull-up voltage
@@ -44,7 +55,7 @@ if (MS_RATE_HOST_CONTROL)
 endif()
 
 pico_set_program_name(usb2ps2 "usb2ps2")
-pico_set_program_version(usb2ps2 "1.2")
+pico_set_program_version(usb2ps2 "1.1")
 
 pico_enable_stdio_uart(usb2ps2 1)
 pico_enable_stdio_usb(usb2ps2 0)
