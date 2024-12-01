@@ -11,10 +11,10 @@ Este proyecto es un fork de https://github.com/No0ne/ps2x2pico pensado como adap
 
 
 # Circuito
-![hw1](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/circuito.jpg) 
-[Descarga Esquema](docs/Schematic_USB2PS-2_2024-08-20.pdf)
+![hw1](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/circuito1.1.jpg) 
+[Descarga Esquema](docs/Schematic_USB2PS-2_1.1_2024-12-01.pdf)
 
-![hw2](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/circuito2.jpg) 
+![hw2](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/pcb1.1-C.jpg) 
 [Descarga Gerber](https://github.com/destroyer-dcf/usb2ps2/releases/download/1.0/Gerber_USB2PS-2_PCB_USB2PS-2_5_2024-08-10.zip)
 
 # Componentes
