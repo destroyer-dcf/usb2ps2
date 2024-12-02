@@ -105,6 +105,9 @@ Si lo prefieres puedes ejecutar el script `compile.sh` cambiando la linea  `expo
 | 1    | LED (opcional)| [ver](https://acortar.link/jYP3aA)    |
 | 1    | Adaptador USB-C a USB | [ver](https://es.aliexpress.com/item/1005004621683764.html#nav-specification) |
 
+# Caja
+Si quieres una caja para la placa en este link tienes los stl del proyecto. GRACIAS a Daniel por el "$PWD"
+[STL]( https://www.thingiverse.com/thing:6853001)
 
 # Soldar JST XH2.54 4 pin a Dim 6
 
@@ -119,6 +122,7 @@ Si lo prefieres puedes ejecutar el script `compile.sh` cambiando la linea  `expo
 | 1    | Amarillo| DATA    |
 | 2    | Sin Uso| Sin Uso  |
 | 6    | Sin Uso| Sin Uso |
+
 
 <!-- ```diff
 - text in yellow
