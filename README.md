@@ -106,8 +106,9 @@ Si lo prefieres puedes ejecutar el script `compile.sh` cambiando la linea  `expo
 | 1    | Adaptador USB-C a USB | [ver](https://es.aliexpress.com/item/1005004621683764.html#nav-specification) |
 
 # Caja
-Si quieres una caja para la placa en este link tienes los stl del proyecto. GRACIAS a Daniel por el trabajo!!!!!
-[STL]( https://www.thingiverse.com/thing:6853001)
+Si quieres una caja para la placa en este link tienes los [STL]( https://www.thingiverse.com/thing:6853001) del proyecto. GRACIAS a Daniel por el trabajo!!!!!
+![hw1](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/thingiverse.jpg) 
+
 
 # Soldar JST XH2.54 4 pin a Dim 6
 
