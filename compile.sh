@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export PICO_SDK_PATH=~/pico-sdk
+export PICO_SDK_PATH=~/pico/pico-sdk
 
 ARTIFACT="usb2ps2"
 
@@ -21,4 +21,3 @@ cd $BUILD_DIR
 cmake -DCMAKE_BUILD_TYPE=Debug .. 
 make
 cd ..
-# cp build/usb2ps2.uf2 /media/destroyer/RPI-RP2
