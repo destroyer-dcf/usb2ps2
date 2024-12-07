@@ -121,10 +121,7 @@ u8 last_byte_sent = 0;
 void kb_send(u8 byte) {
   if (byte != KB_MSG_RESEND_FE){
     last_byte_sent = byte;
-  } else {
-    printf("NO TENGO NI PUTA IDEA");
   }
-  printf("----> ENVIA SCANCODE: %02x\n", byte);
 // printf("Dirección de kb_out.qbytes: %p\n", (void *)&kb_out.qbytes);
 // printf("Dirección de last_byte_sent: %p\n", (void *)&last_byte_sent);
   queue_try_add(&kb_out.qbytes, &byte);
