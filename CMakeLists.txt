@@ -5,8 +5,8 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 
 # Cambia esta línea para seleccionar la placa deseada
-# set(PICO_BOARD waveshare_rp2040_zero CACHE STRING "Board type")
-set(PICO_BOARD pico CACHE STRING "Board type")
+set(PICO_BOARD waveshare_rp2040_zero CACHE STRING "Board type")
+#set(PICO_BOARD pico CACHE STRING "Board type")
 
 set(MS_RATE_DEFAULT 100 CACHE STRING "Default mouse sample rate")
 set(MS_RATE_HOST_CONTROL ON CACHE BOOL "Allow the host to configure the mouse sample rate")
@@ -23,7 +23,7 @@ project(usb2ps2 C CXX ASM)
 pico_sdk_init()
 
 # add_compile_definitions(PICO_DEFAULT_LED_PIN=10)
-add_compile_definitions(PICO_DEFAULT_LED_PIN=25)
+add_compile_definitions(PICO_DEFAULT_LED_PIN=10)
 add_executable(usb2ps2 src/ps2x2pico.c src/scancodesets.c src/ps2kb.c src/ps2ms.c src/ps2out.c src/ps2in.c src/ps2pad.c)
 
 pico_generate_pio_header(usb2ps2 ${CMAKE_CURRENT_LIST_DIR}/src/ps2out.pio)
