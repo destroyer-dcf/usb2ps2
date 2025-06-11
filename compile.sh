@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export PICO_SDK_PATH=~/pico/pico-sdk
+export PICO_SDK_PATH=~/.pico-sdk/sdk/2.1.0
 
 ARTIFACT="usb2ps2"
 
