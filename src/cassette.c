@@ -16,7 +16,7 @@
 #define SCANCODE_REW 0x1C
 #define SCANCODE_FF 0x1C
 #define SCANCODE_STOP 0x1C
-#define SCANCODE_PAUSE 0x1C
+#define SCANCODE_PAUSE 0x7e
 
 
 #define SCAN_CODE_SET_F0 0xf0
