@@ -11,12 +11,12 @@
 #define CASSETTE_STOP 8
 #define CASSETTE_PAUSE 2
 
-#define SCANCODE_REC 0x1C
+#define SCANCODE_REC 0x0c
 #define SCANCODE_PLAY 0x1C
 #define SCANCODE_REW 0x1C
 #define SCANCODE_FF 0x1C
 #define SCANCODE_STOP 0x1C
-#define SCANCODE_PAUSE 0x7e
+
 
 
 #define SCAN_CODE_SET_F0 0xf0
@@ -91,13 +91,11 @@ void Pause() {
     kb_send(0x14);
     kb_send(0x77);
     kb_send(0xE1);
-    kb_send(0xF0);
+    kb_send(SCAN_CODE_SET_F0);
     kb_send(0x14);
-    kb_send(0xF0);
+    kb_send(SCAN_CODE_SET_F0);
     kb_send(0x77);
-
 }
-
 
 void cassetteControl()
 {
@@ -128,7 +126,6 @@ void cassetteControl()
         sendCassetteButton(SCANCODE_PLAY, true);
         cassette_state.last_play = 1;
     }
-
 
     // ##### REW BUTTON #####
     if (cassette_state.rew == 0 && cassette_state.last_rew== 1) {
