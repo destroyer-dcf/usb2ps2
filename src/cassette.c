@@ -86,6 +86,19 @@ void sendCassetteButton(uint8_t scancode, int pressed) {
     }
 }
 
+void Pause() {
+    kb_send(0xE1);
+    kb_send(0x14);
+    kb_send(0x77);
+    kb_send(0xE1);
+    kb_send(0xF0);
+    kb_send(0x14);
+    kb_send(0xF0);
+    kb_send(0x77);
+
+}
+
+
 void cassetteControl()
 {
     readCassetteButton(&cassette_state);
@@ -156,17 +169,12 @@ void cassetteControl()
         cassette_state.last_stop = 1;
     }
 
-
     // ##### PAUSE BUTTON #####
-    if (cassette_state.pause == 0 && cassette_state.last_pause== 1) {
-        sendCassetteButton(SCANCODE_PAUSE, true);
-    } else if (cassette_state.pause == 1 && cassette_state.last_pause == 1) {
-        sendCassetteButton(SCANCODE_PAUSE, false);
-        cassette_state.last_pause = 0;
-    }
+    static uint32_t last_pause_time = 0;
+    uint32_t now = time_us_32();
 
-    if (cassette_state.pause == 0 && cassette_state.last_pause == 0) {
-        sendCassetteButton(SCANCODE_PAUSE, true);
-        cassette_state.last_pause= 1;
+    if (cassette_state.pause == 0 && (now - last_pause_time > 200000)) { 
+        Pause();
+        last_pause_time = now;
     }
 }
