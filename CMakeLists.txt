@@ -38,7 +38,7 @@ pico_sdk_init()
 
 # add_compile_definitions(PICO_DEFAULT_LED_PIN=10)
 add_compile_definitions(PICO_DEFAULT_LED_PIN=25)
-add_executable(usb2ps2 src/usb2ps2.c src/scancodesets.c src/ps2kb.c src/ps2ms.c src/ps2out.c src/ps2in.c src/ps2pad.c)
+add_executable(usb2ps2 src/usb2ps2.c src/scancodesets.c src/ps2kb.c src/ps2ms.c src/ps2out.c src/ps2in.c src/cassette.c)
 
 pico_generate_pio_header(usb2ps2 ${CMAKE_CURRENT_LIST_DIR}/src/ps2out.pio)
 pico_generate_pio_header(usb2ps2 ${CMAKE_CURRENT_LIST_DIR}/src/ps2in.pio)
