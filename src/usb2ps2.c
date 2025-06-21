@@ -32,10 +32,17 @@
 #include "hardware/gpio.h"
 #include "bsp/board_api.h"
 #include "tusb.h"
-#include "ps2x2pico.h"
+
+#include "usb2ps2.h"
+
+
+#define myMillis to_ms_since_boot(get_absolute_time()) //nos da el tiempo en milisegundo desde que hemos arrancado la placa
+#define db9_periodo 100 //100 ms serian 10 veces por segundo
 
 static void print_utf16(uint16_t *temp_buf, size_t buf_len);
 void print_device_descriptor(tuh_xfer_t* xfer);
+
+unsigned long last_millisDB9=0; // almacena el ultimo tiempo leido para db9
 
 u8 kb_addr = 0;
 u8 kb_inst = 0;
@@ -46,6 +53,8 @@ char manufacturer_str[50];
 //STAR GAMEPAD
 uint32_t last_button_check = 0; 
 //END GAMEPAD
+
+
 
 void tuh_kb_set_leds(u8 leds) {
   if(kb_addr) {
@@ -168,25 +177,29 @@ void tuh_hid_report_received_cb(u8 dev_addr, u8 instance, u8 const* report, u16 
 }
 
 void setup() {
-    gpio_init(GAMEPAD_LEFT);
-    gpio_set_dir(GAMEPAD_LEFT, GPIO_IN);
-    gpio_pull_up(GAMEPAD_LEFT);
+    gpio_init(CASSETTE_REW);
+    gpio_set_dir(CASSETTE_REW, GPIO_IN);
+    gpio_pull_up(CASSETTE_REW);
 
-    gpio_init(GAMEPAD_RIGHT);
-    gpio_set_dir(GAMEPAD_RIGHT, GPIO_IN);
-    gpio_pull_up(GAMEPAD_RIGHT);
+    gpio_init(CASSETTE_FF);
+    gpio_set_dir(CASSETTE_FF, GPIO_IN);
+    gpio_pull_up(CASSETTE_FF);
 
-    gpio_init(GAMEPAD_UP);
-    gpio_set_dir(GAMEPAD_UP, GPIO_IN);
-    gpio_pull_up(GAMEPAD_UP);
+    gpio_init(CASSETTE_REC);
+    gpio_set_dir(CASSETTE_REC, GPIO_IN);
+    gpio_pull_up(CASSETTE_REC);
 
-    gpio_init(GAMEPAD_DOWN);
-    gpio_set_dir(GAMEPAD_DOWN, GPIO_IN);
-    gpio_pull_up(GAMEPAD_DOWN);
+    gpio_init(CASSETTE_PLAY);
+    gpio_set_dir(CASSETTE_PLAY, GPIO_IN);
+    gpio_pull_up(CASSETTE_PLAY);
 
-    gpio_init(GAMEPAD_FIRE);
-    gpio_set_dir(GAMEPAD_FIRE, GPIO_IN);
-    gpio_pull_up(GAMEPAD_FIRE);
+    gpio_init(CASSETTE_STOP);
+    gpio_set_dir(CASSETTE_STOP, GPIO_IN);
+    gpio_pull_up(CASSETTE_STOP);
+
+    gpio_init(CASSETTE_PAUSE);
+    gpio_set_dir(CASSETTE_PAUSE, GPIO_IN);
+    gpio_pull_up(CASSETTE_PAUSE);
 }
 
 
@@ -204,18 +217,16 @@ void main() {
     tusb_init();
     kb_init(KBOUT, KBIN);
     ms_init(MSOUT, MSIN);
-
     setup();
-  
-    while (1) {
+    while (true) {
 
         tuh_task();
         kb_task();
         ms_task();
-
+        
         uint32_t current_time = time_us_32();  // Obtener tiempo actual en microsegundos
         if (current_time - last_button_check >= DEBOUNCE_TIME * 1000) {
-            gamepad_controls();
+            cassette_control();
             last_button_check = current_time;  // Actualiza la última verificación
         }
         

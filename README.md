@@ -1,6 +1,6 @@
 # USB2PS2
 Convertidor de teclado USB a PS/2 con una placa RP2040 Zero.
-Este proyecto es un fork de https://github.com/No0ne/ps2x2pico pensado como adaptacion para mi [ESPectrum](https://github.com/EremusOne/ESPectrum)
+Este proyecto es un fork de https://github.com/No0ne/usb2ps2 pensado como adaptacion para mi [ESPectrum](https://github.com/EremusOne/ESPectrum)
 
 
 ## Version 1.1 (Keyboard and Mouse Support) (30/11/2024)
@@ -191,7 +191,7 @@ make
 Si lo prefieres puedes ejecutar el script `compile.sh` cambiando la linea  `export PICO_SDK_PATH=~/pico-sdk` por tu path de pico-sdk
 
 # Recursos
-* https://github.com/No0ne/ps2x2pico
+* https://github.com/No0ne/usb2ps2
 
 # Agradecimientos
 Gracias a NoOne por su ayuda y compartir su trabajo.

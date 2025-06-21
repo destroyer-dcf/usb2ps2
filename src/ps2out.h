@@ -27,7 +27,7 @@
 
 #include "hardware/pio.h"
 #include "pico/util/queue.h"
-#include "ps2x2pico.h"
+#include "usb2ps2.h"
 
 u32 ps2_frame(u8 byte);
 typedef void (*rx_callback)(u8 byte, u8 prev_byte);

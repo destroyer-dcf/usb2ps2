@@ -10,31 +10,42 @@
 
 //START GAMEPAD
 
-#define GAMEPAD_UP 2 
-#define GAMEPAD_DOWN 3
-#define GAMEPAD_LEFT 4 
-#define GAMEPAD_RIGHT 5 
-#define GAMEPAD_FIRE 6 
+#define CASSETTE_REC 28
+#define CASSETTE_PLAY 27
+#define CASSETTE_REW 26
+#define CASSETTE_FF 9
+#define CASSETTE_STOP 8
+#define CASSETTE_PAUSE 2
 
-#define ESP_JOY1LEFT 0x40
-#define ESP_JOY1RIGHT 0x41
-#define ESP_JOY1UP 0x42
-#define ESP_JOY1DOWN 0x43
-#define ESP_JOYFIRE 0x46
+// #define ESP_JOY1LEFT 0x40
+// #define ESP_JOY1RIGHT 0x41
+// #define ESP_JOY1UP 0x42
+// #define ESP_JOY1DOWN 0x43
+// #define ESP_JOYFIRE 0x46
+
+#define SCANCODE_REC 0x1C
+#define SCANCODE_PLAY 0x32
+#define SCANCODE_REW 0x21
+#define SCANCODE_FF 0x23
+#define SCANCODE_STOP 0x24
+#define SCANCODE_PAUSE 0x2B
+
 
 #define SCAN_CODE_SET_F0 0xf0
 #define SCAN_CODE_SET_E2 0xe2
 
-bool gamepad_left_state = false;
-bool gamepad_left_prev_state = false;
-bool gamepad_right_state = false;
-bool gamepad_right_prev_state = false;
-bool gamepad_up_state = false;
-bool gamepad_up_prev_state = false;
-bool gamepad_down_state = false;
-bool gamepad_down_prev_state = false;
-bool gamepad_fire_state = false;
-bool gamepad_fire_prev_state = false;
+bool CASSETTE_REW_state = false;
+bool CASSETTE_REW_prev_state = false;
+bool CASSETTE_FF_state = false;
+bool CASSETTE_FF_prev_state = false;
+bool CASSETTE_REC_state = false;
+bool CASSETTE_REC_prev_state = false;
+bool CASSETTE_PLAY_state = false;
+bool CASSETTE_PLAY_prev_state = false;
+bool CASSETTE_STOP_state = false;
+bool CASSETTE_STOP_prev_state = false;
+bool CASSETTE_PAUSE_state = false;
+bool CASSETTE_PAUSE_prev_state = false;
 
 #define SCAN_CODE_SET_F0 0xf0
 #define SCAN_CODE_SET_E2 0xe2
@@ -51,10 +62,10 @@ bool gamepad_fire_prev_state = false;
 
 
 void sendGamePad(u8 scancode, bool press) {
-    printf("***** GAMEPAD CONTROL\n");
+    printf("***** CASSETTE CONTROL\n");
     kb_send(SCAN_CODE_SET_E2);
     sleep_ms(SLEEP_TIME);
-    printf("----> GAMEPAD PRESSED: %s\n", press ? "TRUE" : "FALSE");
+    printf("----> CASSETTE PRESSED: %s\n", press ? "TRUE" : "FALSE");
     if (!press) {
         kb_send(KB_BREAK_2_3);
         sleep_ms(SLEEP_TIME);
@@ -65,67 +76,77 @@ void sendGamePad(u8 scancode, bool press) {
 }
 
 
-void gamepad_controls() {
+void cassette_control() {
     
-    gamepad_left_state  = !gpio_get(GAMEPAD_LEFT);
-    gamepad_right_state = !gpio_get(GAMEPAD_RIGHT);
-    gamepad_up_state    = !gpio_get(GAMEPAD_UP);
-    gamepad_down_state  = !gpio_get(GAMEPAD_DOWN);
-    gamepad_fire_state  = !gpio_get(GAMEPAD_FIRE);
+    CASSETTE_REW_state  = !gpio_get(CASSETTE_REW);
+    CASSETTE_FF_state = !gpio_get(CASSETTE_FF);
+    CASSETTE_REC_state    = !gpio_get(CASSETTE_REC);
+    CASSETTE_PLAY_state  = !gpio_get(CASSETTE_PLAY);
+    CASSETTE_STOP_state  = !gpio_get(CASSETTE_STOP);
+    CASSETTE_PAUSE_state  = !gpio_get(CASSETTE_PAUSE);
 
-    // LEFT CONTROL ******
-    if (gamepad_left_state && !gamepad_left_prev_state) {
-        //sendGamePad(ESP_JOY1LEFT,true);
-        kb_send_key_gamepad_control(0,true);
+    // REC ******
+    if (CASSETTE_REC_state && !CASSETTE_REC_prev_state) {
+        //sendGamePad(SCANCODE_REC,true);
+        kb_send_key_cassette_control(0,true);
     }
-    if (!gamepad_left_state && gamepad_left_prev_state) {
-        //sendGamePad(ESP_JOY1LEFT,false);
-        kb_send_key_gamepad_control(0,false);
-    }
-
-    // RIGHT CONTROL ******
-    if (gamepad_right_state && !gamepad_right_prev_state) {
-        // sendGamePad(ESP_JOY1RIGHT,true);
-        kb_send_key_gamepad_control(1,true);
-    }
-    if (!gamepad_right_state && gamepad_right_prev_state) {
-        kb_send_key_gamepad_control(1,false);
-        // sendGamePad(ESP_JOY1RIGHT,false);
+    if (!CASSETTE_REC_state && CASSETTE_REC_prev_state) {
+        //sendGamePad(SCANCODE_REC,false);
+        kb_send_key_cassette_control(0,false);
     }
 
-    // UP CONTROL ******
-    if (gamepad_up_state && !gamepad_up_prev_state) {
-        kb_send_key_gamepad_control(2,true);
-        // sendGamePad(ESP_JOY1UP,true);
+    // PLAY ******
+    if (CASSETTE_PLAY_state && !CASSETTE_PLAY_prev_state) {
+        sendGamePad(SCANCODE_PLAY,true);
+        //kb_send_key_cassette_control(1,true);
     }
-    if (!gamepad_up_state && gamepad_up_prev_state) {
-        kb_send_key_gamepad_control(2,false);
-        // sendGamePad(ESP_JOY1UP,false);
+    if (!CASSETTE_PLAY_state && CASSETTE_PLAY_prev_state) {
+        //kb_send_key_cassette_control(1,false);
+        sendGamePad(SCANCODE_PLAY,false);
     }
 
-    // DOWN CONTROL ******
-    if (gamepad_down_state && !gamepad_down_prev_state) {
-        kb_send_key_gamepad_control(3,true);
-        // sendGamePad(ESP_JOY1DOWN,true);
+    // REW ******
+    if (CASSETTE_REW_state && !CASSETTE_REW_prev_state) {
+        //kb_send_key_cassette_control(2,true);
+        sendGamePad(SCANCODE_REW,true);
     }
-    if (!gamepad_down_state && gamepad_down_prev_state) {
-        // sendGamePad(ESP_JOY1DOWN,false);
-        kb_send_key_gamepad_control(3,false);
+    if (!CASSETTE_REW_state && CASSETTE_REW_prev_state) {
+        //kb_send_key_cassette_control(2,false);
+        sendGamePad(SCANCODE_REW,false);
+    }
+
+    // FF ******
+    if (CASSETTE_FF_state && !CASSETTE_FF_prev_state) {
+        //kb_send_key_cassette_control(3,true);
+        sendGamePad(SCANCODE_FF,true);
+    }
+    if (!CASSETTE_FF_state && CASSETTE_FF_prev_state) {
+        sendGamePad(SCANCODE_FF,false);
+        //kb_send_key_cassette_control(3,false);
     }
 
     // FIRE CONTROL ******
-    if (gamepad_fire_state && !gamepad_fire_prev_state) {
-        // sendGamePad(ESP_JOYFIRE,true);
-        kb_send_key_gamepad_control(6,true);
+    if (CASSETTE_STOP_state && !CASSETTE_STOP_prev_state) {
+        sendGamePad(SCANCODE_STOP,true);
+        //kb_send_key_cassette_control(6,true);
     }
-    if (!gamepad_fire_state && gamepad_fire_prev_state) {
-        // sendGamePad(ESP_JOYFIRE,false);
-        kb_send_key_gamepad_control(6,false);
+    if (!CASSETTE_STOP_state && CASSETTE_STOP_prev_state) {
+        sendGamePad(SCANCODE_STOP,false);
+        //kb_send_key_cassette_control(6,false);
     }
 
-    gamepad_left_prev_state = gamepad_left_state;
-    gamepad_right_prev_state = gamepad_right_state;
-    gamepad_up_prev_state = gamepad_up_state;
-    gamepad_down_prev_state = gamepad_down_state;
-    gamepad_fire_prev_state = gamepad_fire_state;
+        // PAUSE ******
+    if (CASSETTE_PAUSE_state && !CASSETTE_PAUSE_prev_state) {
+        sendGamePad(SCANCODE_PAUSE,true);
+    }
+    if (!CASSETTE_PAUSE_state && CASSETTE_PAUSE_prev_state) {
+        sendGamePad(SCANCODE_PAUSE,false);
+    }
+
+    CASSETTE_REW_prev_state = CASSETTE_REW_state;
+    CASSETTE_FF_prev_state = CASSETTE_FF_state;
+    CASSETTE_REC_prev_state = CASSETTE_REC_state;
+    CASSETTE_PLAY_prev_state = CASSETTE_PLAY_state;
+    CASSETTE_STOP_prev_state = CASSETTE_STOP_state;
+    CASSETTE_PAUSE_prev_state = CASSETTE_PAUSE_state;
 }

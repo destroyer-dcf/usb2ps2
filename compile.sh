@@ -18,6 +18,9 @@ fi
 mkdir $BUILD_DIR
 cd $BUILD_DIR
 
-cmake -DCMAKE_BUILD_TYPE=Debug .. 
+cmake -Wno-dev -DCMAKE_BUILD_TYPE=Debug .. 
 make
 cd ..
+
+
+/Users/destroyer/.pico-sdk/openocd/0.12.0+dev/openocd.exe -s /Users/destroyer/.pico-sdk/openocd/0.12.0+dev/scripts -f interface/cmsis-dap.cfg -f target/rp2040.cfg -c "adapter speed 5000" -c "program build/usb2ps2.elf verify reset exit"
