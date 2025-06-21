@@ -1,3 +1,15 @@
 kb_task --> 
       ps2out_task
       ps2in_task
+
+
+
+Cassette:
+- Tener activado en opciones -> almacenamiento -> carga rapida = NO
+
+Secuencia de comandos:
+F5 para cargar la cinta: Que tecla del cassette?
+Una vez cargada...
+F7 Mostrar la cinta y seleccionar con cursores.... esto REW y FF
+luego escribes Load "" y pulsas intro
+luego F6 que entiendo que es PLAY

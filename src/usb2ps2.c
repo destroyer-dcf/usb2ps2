@@ -37,13 +37,13 @@
 #include "cassette.c"
 
 
-#define myMillis to_ms_since_boot(get_absolute_time()) //nos da el tiempo en milisegundo desde que hemos arrancado la placa
-#define db9_periodo 100 //100 ms serian 10 veces por segundo
+#define firnwareTime to_ms_since_boot(get_absolute_time()) 
+#define ElapsedTime 100 
 
 static void print_utf16(uint16_t *temp_buf, size_t buf_len);
 void print_device_descriptor(tuh_xfer_t* xfer);
 
-unsigned long last_millisDB9=0; // almacena el ultimo tiempo leido para db9
+unsigned long lastTime=0;
 
 u8 kb_addr = 0;
 u8 kb_inst = 0;
@@ -198,21 +198,15 @@ void main() {
     while (true) {
 
 
-        unsigned long currentMillisDB9=myMillis;
-        if (currentMillisDB9 - last_millisDB9 > db9_periodo) {
-            last_millisDB9 = myMillis;
+        unsigned long currentTimeCassette=firnwareTime;
+        if (currentTimeCassette - lastTime > ElapsedTime) {
+            lastTime = firnwareTime;
             cassetteControl();
         }
 
         tuh_task();
         kb_task();
         ms_task();
-        
-        // uint32_t current_time = time_us_32();  // Obtener tiempo actual en microsegundos
-        // if (current_time - last_button_check >= DEBOUNCE_TIME * 1000) {
-        //     cassette_control();
-        //     last_button_check = current_time;  // Actualiza la última verificación
-        // }
         
     }
     

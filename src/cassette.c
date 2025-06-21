@@ -12,12 +12,10 @@
 #define CASSETTE_PAUSE 2
 
 #define SCANCODE_REC 0x0c
-#define SCANCODE_PLAY 0x1C
-#define SCANCODE_REW 0x1C
-#define SCANCODE_FF 0x1C
-#define SCANCODE_STOP 0x1C
-
-
+#define SCANCODE_PLAY 0x0b
+#define SCANCODE_REW 0x83
+#define SCANCODE_FF 0x83
+#define SCANCODE_STOP 0x03
 
 #define SCAN_CODE_SET_F0 0xf0
 #define SCAN_CODE_SET_E2 0xe2
