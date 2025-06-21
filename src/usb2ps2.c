@@ -34,6 +34,7 @@
 #include "tusb.h"
 
 #include "usb2ps2.h"
+#include "cassette.c"
 
 
 #define myMillis to_ms_since_boot(get_absolute_time()) //nos da el tiempo en milisegundo desde que hemos arrancado la placa
@@ -176,31 +177,7 @@ void tuh_hid_report_received_cb(u8 dev_addr, u8 instance, u8 const* report, u16 
   }
 }
 
-void setup() {
-    gpio_init(CASSETTE_REW);
-    gpio_set_dir(CASSETTE_REW, GPIO_IN);
-    gpio_pull_up(CASSETTE_REW);
 
-    gpio_init(CASSETTE_FF);
-    gpio_set_dir(CASSETTE_FF, GPIO_IN);
-    gpio_pull_up(CASSETTE_FF);
-
-    gpio_init(CASSETTE_REC);
-    gpio_set_dir(CASSETTE_REC, GPIO_IN);
-    gpio_pull_up(CASSETTE_REC);
-
-    gpio_init(CASSETTE_PLAY);
-    gpio_set_dir(CASSETTE_PLAY, GPIO_IN);
-    gpio_pull_up(CASSETTE_PLAY);
-
-    gpio_init(CASSETTE_STOP);
-    gpio_set_dir(CASSETTE_STOP, GPIO_IN);
-    gpio_pull_up(CASSETTE_STOP);
-
-    gpio_init(CASSETTE_PAUSE);
-    gpio_set_dir(CASSETTE_PAUSE, GPIO_IN);
-    gpio_pull_up(CASSETTE_PAUSE);
-}
 
 
 void main() {
@@ -217,18 +194,25 @@ void main() {
     tusb_init();
     kb_init(KBOUT, KBIN);
     ms_init(MSOUT, MSIN);
-    setup();
+    setupGpios();
     while (true) {
+
+
+        unsigned long currentMillisDB9=myMillis;
+        if (currentMillisDB9 - last_millisDB9 > db9_periodo) {
+            last_millisDB9 = myMillis;
+            cassetteControl();
+        }
 
         tuh_task();
         kb_task();
         ms_task();
         
-        uint32_t current_time = time_us_32();  // Obtener tiempo actual en microsegundos
-        if (current_time - last_button_check >= DEBOUNCE_TIME * 1000) {
-            cassette_control();
-            last_button_check = current_time;  // Actualiza la última verificación
-        }
+        // uint32_t current_time = time_us_32();  // Obtener tiempo actual en microsegundos
+        // if (current_time - last_button_check >= DEBOUNCE_TIME * 1000) {
+        //     cassette_control();
+        //     last_button_check = current_time;  // Actualiza la última verificación
+        // }
         
     }
     

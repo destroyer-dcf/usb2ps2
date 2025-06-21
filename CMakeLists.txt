@@ -38,7 +38,7 @@ pico_sdk_init()
 
 # add_compile_definitions(PICO_DEFAULT_LED_PIN=10)
 add_compile_definitions(PICO_DEFAULT_LED_PIN=25)
-add_executable(usb2ps2 src/usb2ps2.c src/scancodesets.c src/ps2kb.c src/ps2ms.c src/ps2out.c src/ps2in.c src/cassette.c)
+add_executable(usb2ps2 src/usb2ps2.c src/scancodesets.c src/ps2kb.c src/ps2ms.c src/ps2out.c src/ps2in.c)
 
 pico_generate_pio_header(usb2ps2 ${CMAKE_CURRENT_LIST_DIR}/src/ps2out.pio)
 pico_generate_pio_header(usb2ps2 ${CMAKE_CURRENT_LIST_DIR}/src/ps2in.pio)
@@ -52,7 +52,7 @@ add_compile_definitions(CASSETTE_FF=9)
 add_compile_definitions(CASSETTE_STOP=8) 
 add_compile_definitions(CASSETTE_PAUSE=2)
 
-add_compile_definitions(DEBOUNCE_TIME=100) # tiempo de rebote
+add_compile_definitions(DEBOUNCE_TIME=50) # tiempo de rebote
 
 ### PS/2 output
 add_compile_definitions(LVOUT=13) # Level shifter pull-up voltage

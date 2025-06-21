@@ -1,14 +1,8 @@
 
-#include <stdbool.h>
 #include "pico/stdlib.h"
-#include <stdio.h>
-#include "tusb.h"
-#include "ps2out.h"
-#include "ps2in.h"
-#include "hardware/watchdog.h"
+#include "hardware/gpio.h"
+#include "hardware/timer.h"
 #include "scancodesets.h"
-
-//START GAMEPAD
 
 #define CASSETTE_REC 28
 #define CASSETTE_PLAY 27
@@ -17,136 +11,162 @@
 #define CASSETTE_STOP 8
 #define CASSETTE_PAUSE 2
 
-// #define ESP_JOY1LEFT 0x40
-// #define ESP_JOY1RIGHT 0x41
-// #define ESP_JOY1UP 0x42
-// #define ESP_JOY1DOWN 0x43
-// #define ESP_JOYFIRE 0x46
-
 #define SCANCODE_REC 0x1C
-#define SCANCODE_PLAY 0x32
-#define SCANCODE_REW 0x21
-#define SCANCODE_FF 0x23
-#define SCANCODE_STOP 0x24
-#define SCANCODE_PAUSE 0x2B
+#define SCANCODE_PLAY 0x1C
+#define SCANCODE_REW 0x1C
+#define SCANCODE_FF 0x1C
+#define SCANCODE_STOP 0x1C
+#define SCANCODE_PAUSE 0x1C
 
 
 #define SCAN_CODE_SET_F0 0xf0
 #define SCAN_CODE_SET_E2 0xe2
 
-bool CASSETTE_REW_state = false;
-bool CASSETTE_REW_prev_state = false;
-bool CASSETTE_FF_state = false;
-bool CASSETTE_FF_prev_state = false;
-bool CASSETTE_REC_state = false;
-bool CASSETTE_REC_prev_state = false;
-bool CASSETTE_PLAY_state = false;
-bool CASSETTE_PLAY_prev_state = false;
-bool CASSETTE_STOP_state = false;
-bool CASSETTE_STOP_prev_state = false;
-bool CASSETTE_PAUSE_state = false;
-bool CASSETTE_PAUSE_prev_state = false;
+typedef struct {
+    bool rec;
+    bool play;
+    bool rew;
+    bool ff;
+    bool stop;
+    bool pause;
+    bool last_rec;
+    bool last_play;
+    bool last_rew;
+    bool last_ff;
+    bool last_stop;
+    bool last_pause;
+} CassetteState;
 
-#define SCAN_CODE_SET_F0 0xf0
-#define SCAN_CODE_SET_E2 0xe2
-#define SLEEP_TIME 25
+CassetteState cassette_state = {1, 1, 1, 1, 1, 1}; 
 
-//END GAMEPAD
-// u16 delay_ms;
-// alarm_id_t repeater;
-// u8 key2repeat = 0;
+void setupGpios() {
+    gpio_init(CASSETTE_REW);
+    gpio_set_dir(CASSETTE_REW, GPIO_IN);
+    gpio_pull_up(CASSETTE_REW);
 
-// ************************
-// GAMEPAD CONTROL
-// ************************
+    gpio_init(CASSETTE_FF);
+    gpio_set_dir(CASSETTE_FF, GPIO_IN);
+    gpio_pull_up(CASSETTE_FF);
 
+    gpio_init(CASSETTE_REC);
+    gpio_set_dir(CASSETTE_REC, GPIO_IN);
+    gpio_pull_up(CASSETTE_REC);
 
-void sendGamePad(u8 scancode, bool press) {
-    printf("***** CASSETTE CONTROL\n");
-    kb_send(SCAN_CODE_SET_E2);
-    sleep_ms(SLEEP_TIME);
-    printf("----> CASSETTE PRESSED: %s\n", press ? "TRUE" : "FALSE");
-    if (!press) {
-        kb_send(KB_BREAK_2_3);
-        sleep_ms(SLEEP_TIME);
-    }
-    kb_send(scancode);
-    sleep_ms(SLEEP_TIME);
-    printf("**********************\n");
+    gpio_init(CASSETTE_PLAY);
+    gpio_set_dir(CASSETTE_PLAY, GPIO_IN);
+    gpio_pull_up(CASSETTE_PLAY);
+
+    gpio_init(CASSETTE_STOP);
+    gpio_set_dir(CASSETTE_STOP, GPIO_IN);
+    gpio_pull_up(CASSETTE_STOP);
+
+    gpio_init(CASSETTE_PAUSE);
+    gpio_set_dir(CASSETTE_PAUSE, GPIO_IN);
+    gpio_pull_up(CASSETTE_PAUSE);
+}
+
+void readCassetteButton(CassetteState *state) {
+   
+    // Leer el estado de cada botón 1 si no esta pulsado 0 si lo pulsamos
+    state->rec = gpio_get(CASSETTE_REC);
+    state->play = gpio_get(CASSETTE_PLAY);
+    state->rew = gpio_get(CASSETTE_REW);
+    state->ff = gpio_get(CASSETTE_FF);
+    state->stop = gpio_get(CASSETTE_STOP);
+    state->pause = gpio_get(CASSETTE_PAUSE);
 }
 
 
-void cassette_control() {
-    
-    CASSETTE_REW_state  = !gpio_get(CASSETTE_REW);
-    CASSETTE_FF_state = !gpio_get(CASSETTE_FF);
-    CASSETTE_REC_state    = !gpio_get(CASSETTE_REC);
-    CASSETTE_PLAY_state  = !gpio_get(CASSETTE_PLAY);
-    CASSETTE_STOP_state  = !gpio_get(CASSETTE_STOP);
-    CASSETTE_PAUSE_state  = !gpio_get(CASSETTE_PAUSE);
+void sendCassetteButton(uint8_t scancode, int pressed) {
+    if (pressed) {
+        kb_send(scancode);
+    } else {
+        kb_send(SCAN_CODE_SET_F0);
+        kb_send(scancode);
+    }
+}
 
-    // REC ******
-    if (CASSETTE_REC_state && !CASSETTE_REC_prev_state) {
-        //sendGamePad(SCANCODE_REC,true);
-        kb_send_key_cassette_control(0,true);
-    }
-    if (!CASSETTE_REC_state && CASSETTE_REC_prev_state) {
-        //sendGamePad(SCANCODE_REC,false);
-        kb_send_key_cassette_control(0,false);
-    }
+void cassetteControl()
+{
+    readCassetteButton(&cassette_state);
 
-    // PLAY ******
-    if (CASSETTE_PLAY_state && !CASSETTE_PLAY_prev_state) {
-        sendGamePad(SCANCODE_PLAY,true);
-        //kb_send_key_cassette_control(1,true);
-    }
-    if (!CASSETTE_PLAY_state && CASSETTE_PLAY_prev_state) {
-        //kb_send_key_cassette_control(1,false);
-        sendGamePad(SCANCODE_PLAY,false);
+    // ##### REC BUTTON #####
+    if (cassette_state.rec == 0 && cassette_state.last_rec == 1) {
+        sendCassetteButton(SCANCODE_REC, true);
+    } else if (cassette_state.rec == 1 && cassette_state.last_rec == 1) {
+        sendCassetteButton(SCANCODE_REC, false);
+        cassette_state.last_rec = 0;
     }
 
-    // REW ******
-    if (CASSETTE_REW_state && !CASSETTE_REW_prev_state) {
-        //kb_send_key_cassette_control(2,true);
-        sendGamePad(SCANCODE_REW,true);
-    }
-    if (!CASSETTE_REW_state && CASSETTE_REW_prev_state) {
-        //kb_send_key_cassette_control(2,false);
-        sendGamePad(SCANCODE_REW,false);
+    if (cassette_state.rec == 0 && cassette_state.last_rec == 0) {
+        sendCassetteButton(SCANCODE_REC, true);
+        cassette_state.last_rec = 1;
     }
 
-    // FF ******
-    if (CASSETTE_FF_state && !CASSETTE_FF_prev_state) {
-        //kb_send_key_cassette_control(3,true);
-        sendGamePad(SCANCODE_FF,true);
-    }
-    if (!CASSETTE_FF_state && CASSETTE_FF_prev_state) {
-        sendGamePad(SCANCODE_FF,false);
-        //kb_send_key_cassette_control(3,false);
+    // ##### PLAY BUTTON #####
+    if (cassette_state.play == 0 && cassette_state.last_play== 1) {
+        sendCassetteButton(SCANCODE_PLAY, true);
+    } else if (cassette_state.play == 1 && cassette_state.last_play == 1) {
+        sendCassetteButton(SCANCODE_PLAY, false);
+        cassette_state.last_play = 0;
     }
 
-    // FIRE CONTROL ******
-    if (CASSETTE_STOP_state && !CASSETTE_STOP_prev_state) {
-        sendGamePad(SCANCODE_STOP,true);
-        //kb_send_key_cassette_control(6,true);
-    }
-    if (!CASSETTE_STOP_state && CASSETTE_STOP_prev_state) {
-        sendGamePad(SCANCODE_STOP,false);
-        //kb_send_key_cassette_control(6,false);
+    if (cassette_state.play == 0 && cassette_state.last_play == 0) {
+        sendCassetteButton(SCANCODE_PLAY, true);
+        cassette_state.last_play = 1;
     }
 
-        // PAUSE ******
-    if (CASSETTE_PAUSE_state && !CASSETTE_PAUSE_prev_state) {
-        sendGamePad(SCANCODE_PAUSE,true);
-    }
-    if (!CASSETTE_PAUSE_state && CASSETTE_PAUSE_prev_state) {
-        sendGamePad(SCANCODE_PAUSE,false);
+
+    // ##### REW BUTTON #####
+    if (cassette_state.rew == 0 && cassette_state.last_rew== 1) {
+        sendCassetteButton(SCANCODE_REW, true);
+    } else if (cassette_state.rew == 1 && cassette_state.last_rew == 1) {
+        sendCassetteButton(SCANCODE_REW, false);
+        cassette_state.last_rew = 0;
     }
 
-    CASSETTE_REW_prev_state = CASSETTE_REW_state;
-    CASSETTE_FF_prev_state = CASSETTE_FF_state;
-    CASSETTE_REC_prev_state = CASSETTE_REC_state;
-    CASSETTE_PLAY_prev_state = CASSETTE_PLAY_state;
-    CASSETTE_STOP_prev_state = CASSETTE_STOP_state;
-    CASSETTE_PAUSE_prev_state = CASSETTE_PAUSE_state;
+    if (cassette_state.rew == 0 && cassette_state.last_rew == 0) {
+        sendCassetteButton(SCANCODE_REW, true);
+        cassette_state.last_rew = 1;
+    }
+
+    // ##### FF BUTTON #####
+    if (cassette_state.ff == 0 && cassette_state.last_ff== 1) {
+        sendCassetteButton(SCANCODE_FF, true);
+    } else if (cassette_state.ff == 1 && cassette_state.last_ff == 1) {
+        sendCassetteButton(SCANCODE_FF, false);
+        cassette_state.last_ff = 0;
+    }
+
+    if (cassette_state.ff == 0 && cassette_state.last_ff == 0) {
+        sendCassetteButton(SCANCODE_FF, true);
+        cassette_state.last_ff = 1;
+    }
+
+    // ##### STOP BUTTON #####
+    if (cassette_state.stop == 0 && cassette_state.last_stop== 1) {
+        sendCassetteButton(SCANCODE_STOP, true);
+    } else if (cassette_state.stop == 1 && cassette_state.last_stop == 1) {
+        sendCassetteButton(SCANCODE_STOP, false);
+        cassette_state.last_ff = 0;
+    }
+
+    if (cassette_state.stop == 0 && cassette_state.last_stop == 0) {
+        sendCassetteButton(SCANCODE_STOP, true);
+        cassette_state.last_stop = 1;
+    }
+
+
+    // ##### PAUSE BUTTON #####
+    if (cassette_state.pause == 0 && cassette_state.last_pause== 1) {
+        sendCassetteButton(SCANCODE_PAUSE, true);
+    } else if (cassette_state.pause == 1 && cassette_state.last_pause == 1) {
+        sendCassetteButton(SCANCODE_PAUSE, false);
+        cassette_state.last_pause = 0;
+    }
+
+    if (cassette_state.pause == 0 && cassette_state.last_pause == 0) {
+        sendCassetteButton(SCANCODE_PAUSE, true);
+        cassette_state.last_pause= 1;
+    }
 }

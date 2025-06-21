@@ -49,4 +49,4 @@ void kb_set_defaults();
 void ms_init(u8 gpio_out, u8 gpio_in);
 void ms_usb_receive(u8 const* report);
 bool ms_task();
-void cassette_control();
+
