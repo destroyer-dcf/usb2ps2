@@ -22,16 +22,12 @@ Tener activado en opciones -> almacenamiento -> carga rapida = NO
 
 ### Como Utilizar Cassette
 
-EJECT: Para cargar cinta (Moverse con los cursores por el menu)
-REW/FF: Para seleccionar en la cinta que cargar (Moverse con cursores)
-LOAD "" + INTRO
-PLAY
+- *EJECT*: Para cargar cinta (Moverse con los cursores por el menu)
+- *REW/FF*: Para seleccionar en la cinta que cargar (Moverse con cursores)
+- *LOAD "" + INTRO*
+- *PLAY*
 
 |![hw1](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/cassette.jpg) |
-
-
-
-
 
 ## Version 1.1 (Keyboard and Mouse Support) (30/11/2024)
 
