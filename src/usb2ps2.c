@@ -32,10 +32,18 @@
 #include "hardware/gpio.h"
 #include "bsp/board_api.h"
 #include "tusb.h"
-#include "ps2x2pico.h"
+
+#include "usb2ps2.h"
+#include "cassette.c"
+
+
+#define firnwareTime to_ms_since_boot(get_absolute_time()) 
+#define ElapsedTime 100 
 
 static void print_utf16(uint16_t *temp_buf, size_t buf_len);
 void print_device_descriptor(tuh_xfer_t* xfer);
+
+unsigned long lastTime=0;
 
 u8 kb_addr = 0;
 u8 kb_inst = 0;
@@ -46,6 +54,8 @@ char manufacturer_str[50];
 //STAR GAMEPAD
 uint32_t last_button_check = 0; 
 //END GAMEPAD
+
+
 
 void tuh_kb_set_leds(u8 leds) {
   if(kb_addr) {
@@ -167,27 +177,7 @@ void tuh_hid_report_received_cb(u8 dev_addr, u8 instance, u8 const* report, u16 
   }
 }
 
-void setup() {
-    gpio_init(GAMEPAD_LEFT);
-    gpio_set_dir(GAMEPAD_LEFT, GPIO_IN);
-    gpio_pull_up(GAMEPAD_LEFT);
 
-    gpio_init(GAMEPAD_RIGHT);
-    gpio_set_dir(GAMEPAD_RIGHT, GPIO_IN);
-    gpio_pull_up(GAMEPAD_RIGHT);
-
-    gpio_init(GAMEPAD_UP);
-    gpio_set_dir(GAMEPAD_UP, GPIO_IN);
-    gpio_pull_up(GAMEPAD_UP);
-
-    gpio_init(GAMEPAD_DOWN);
-    gpio_set_dir(GAMEPAD_DOWN, GPIO_IN);
-    gpio_pull_up(GAMEPAD_DOWN);
-
-    gpio_init(GAMEPAD_FIRE);
-    gpio_set_dir(GAMEPAD_FIRE, GPIO_IN);
-    gpio_pull_up(GAMEPAD_FIRE);
-}
 
 
 void main() {
@@ -204,20 +194,19 @@ void main() {
     tusb_init();
     kb_init(KBOUT, KBIN);
     ms_init(MSOUT, MSIN);
+    setupGpios();
+    while (true) {
 
-    setup();
-  
-    while (1) {
+
+        unsigned long currentTimeCassette=firnwareTime;
+        if (currentTimeCassette - lastTime > ElapsedTime) {
+            lastTime = firnwareTime;
+            cassetteControl();
+        }
 
         tuh_task();
         kb_task();
         ms_task();
-
-        uint32_t current_time = time_us_32();  // Obtener tiempo actual en microsegundos
-        if (current_time - last_button_check >= DEBOUNCE_TIME * 1000) {
-            gamepad_controls();
-            last_button_check = current_time;  // Actualiza la última verificación
-        }
         
     }
     

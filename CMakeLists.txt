@@ -7,7 +7,7 @@ endif()
 set(sdkVersion 1.5.1)
 set(toolchainVersion 13_2_Rel1)
 set(picotoolVersion 2.0.0)
-set(picoVscode ${USERHOME}/.pico-sdk/cmake/pico-vscode.cmake)
+set(picoVscode ${USERHOME}/.pico-sdk/sdk/2.1.0/cmake/pico-vscode.cmake)
 if (EXISTS ${picoVscode})
     include(${picoVscode})
 endif()
@@ -37,20 +37,22 @@ project(usb2ps2 C CXX ASM)
 pico_sdk_init()
 
 # add_compile_definitions(PICO_DEFAULT_LED_PIN=10)
-add_compile_definitions(PICO_DEFAULT_LED_PIN=10)
-add_executable(usb2ps2 src/ps2x2pico.c src/scancodesets.c src/ps2kb.c src/ps2ms.c src/ps2out.c src/ps2in.c src/ps2pad.c)
+add_compile_definitions(PICO_DEFAULT_LED_PIN=25)
+add_executable(usb2ps2 src/usb2ps2.c src/scancodesets.c src/ps2kb.c src/ps2ms.c src/ps2out.c src/ps2in.c)
 
 pico_generate_pio_header(usb2ps2 ${CMAKE_CURRENT_LIST_DIR}/src/ps2out.pio)
 pico_generate_pio_header(usb2ps2 ${CMAKE_CURRENT_LIST_DIR}/src/ps2in.pio)
 
 ### BUTTON GAMEPAD
 add_compile_definitions(BUTTON_TESTING=22) # Button testing
-add_compile_definitions(GAMEPAD_UP=2) 
-add_compile_definitions(GAMEPAD_DOWN=3) 
-add_compile_definitions(GAMEPAD_LEFT=4) 
-add_compile_definitions(GAMEPAD_RIGHT=5) 
-add_compile_definitions(GAMEPAD_FIRE=6) 
-add_compile_definitions(DEBOUNCE_TIME=25) # tiempo de rebote
+add_compile_definitions(CASSETTE_REC=28) 
+add_compile_definitions(CASSETTE_PLAY=27) 
+add_compile_definitions(CASSETTE_REW=26) 
+add_compile_definitions(CASSETTE_FF=9) 
+add_compile_definitions(CASSETTE_STOP=8) 
+add_compile_definitions(CASSETTE_PAUSE=2)
+
+add_compile_definitions(DEBOUNCE_TIME=50) # tiempo de rebote
 
 ### PS/2 output
 add_compile_definitions(LVOUT=13) # Level shifter pull-up voltage

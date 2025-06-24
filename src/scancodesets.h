@@ -27,7 +27,7 @@
  */
 
 
-#include "ps2x2pico.h"
+#include "usb2ps2.h"
 
 #define KB_EXT_PFX_E0 0xe0 // This is the extended code prefix used in sets 1 and 2
 #define KB_BREAK_2_3 0xf0 // The prefix 0xf0 is the break code prefex in sets 2 and 3 (is send when key is released)
@@ -52,4 +52,4 @@ extern u8 const prt_scn_make_2[];
 extern u8 const prt_scn_break_2[];
 extern u8 const break_make_2[];
 extern u8 const pause_make_2[];
-extern u8 const gamepad_scancodes[];
+extern u8 const cassette_scancodes[];

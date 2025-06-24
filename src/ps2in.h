@@ -25,7 +25,7 @@
 
 
 #include "hardware/pio.h"
-#include "ps2x2pico.h"
+#include "usb2ps2.h"
 
 typedef struct {
   PIO pio;

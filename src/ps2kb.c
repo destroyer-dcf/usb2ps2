@@ -369,7 +369,7 @@ void kb_send_key(u8 key, bool is_key_pressed, u8 modifiers) {
       break;
     // case SCAN_CODE_SET_4:
     //   printf("----> SCANCODE SET 4\n");
-    //   kb_send_key_gamepad_control(key, is_key_pressed);
+    //   kb_send_key_cassette_control(key, is_key_pressed);
     //   //kb_send_key_scs2(key, is_key_pressed, is_ctrl);
     //   break;
     default:
@@ -670,10 +670,10 @@ void kb_init(u8 gpio_out, u8 gpio_in) {
   kb_send(KB_MSG_SELFTEST_PASSED_AA);
 }
 
-void kb_send_key_gamepad_control(u8 key, bool is_key_pressed) {
-  printf("***** GAMEPAD CONTROL\n");
+void kb_send_key_cassette_control(u8 key, bool is_key_pressed) {
+  printf("***** CASSETTE CONTROL\n");
   printf("----> KEY VALUE: %u\n", key);
-  u8 scan_code = gamepad_scancodes[key];
+  u8 scan_code = cassette_scancodes[key];
   kb_send(SCAN_CODE_SET_E2);   
   if (is_key_pressed) {
     printf("----> KEY PRESET: TRUE\n");
