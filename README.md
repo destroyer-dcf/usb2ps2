@@ -3,6 +3,36 @@ Convertidor de teclado USB a PS/2 con una placa RP2040 Zero.
 Este proyecto es un fork de https://github.com/No0ne/usb2ps2 pensado como adaptacion para mi [ESPectrum](https://github.com/EremusOne/ESPectrum)
 
 
+## Version 1.2 (keyboard, mouse and cassette buttons Support) (24/12/2025)
+
+Se implementa botones de cassete para Emulador ESPectrum.
+
+| PIN | CASSETTE| 
+|----------|----------|
+| 28    | REC  | Snapshot emulador (F4)  |
+| 27   | PLAY   | PLAY  (F6) |
+| 26   | REW   | Abre TAPE Browser (F7)|
+| 9    | FF| Abre TAPE Browser (F7)|
+| 8    | EJECT| Selecciona TAP File (F5)   |
+| 2    | PAUSE| Pausa emulador   |
+
+### Requisitos:
+
+Tener activado en opciones -> almacenamiento -> carga rapida = NO
+
+### Como Utilizar Cassette
+
+EJECT: Para cargar cinta (Moverse con los cursores por el menu)
+REW/FF: Para seleccionar en la cinta que cargar (Moverse con cursores)
+LOAD "" + INTRO
+PLAY
+
+|![hw1](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/cassette.jpg) |
+
+
+
+
+
 ## Version 1.1 (Keyboard and Mouse Support) (30/11/2024)
 
 
