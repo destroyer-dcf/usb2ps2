@@ -7,7 +7,7 @@ Este proyecto es un fork de https://github.com/No0ne/usb2ps2 pensado como adapta
 
 Se implementa botones de cassete para Emulador ESPectrum.
 
-| PIN | CASSETTE| 
+| PIN | BUTTON| 
 |----------|----------|
 | 28    | REC  | Snapshot emulador (F4)  |
 | 27   | PLAY   | PLAY  (F6) |
