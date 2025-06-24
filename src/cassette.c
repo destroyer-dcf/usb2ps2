@@ -152,17 +152,17 @@ void cassetteControl()
     }
 
     // ##### STOP BUTTON #####
-    if (cassette_state.stop == 0 && cassette_state.last_stop== 1) {
+    if (cassette_state.stop == 0 && cassette_state.last_stop == 1) {
+        // Flanco de bajada: se acaba de pulsar
         sendCassetteButton(SCANCODE_STOP, true);
-    } else if (cassette_state.stop == 1 && cassette_state.last_stop == 1) {
+    }
+    else if (cassette_state.stop == 1 && cassette_state.last_stop == 0) {
+        // Flanco de subida: se acaba de soltar
         sendCassetteButton(SCANCODE_STOP, false);
-        cassette_state.last_ff = 0;
     }
 
-    if (cassette_state.stop == 0 && cassette_state.last_stop == 0) {
-        sendCassetteButton(SCANCODE_STOP, true);
-        cassette_state.last_stop = 1;
-    }
+    // Actualiza el estado anterior
+    cassette_state.last_stop = cassette_state.stop;
 
     // ##### PAUSE BUTTON #####
     static uint32_t last_pause_time = 0;
