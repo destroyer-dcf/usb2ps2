@@ -29,7 +29,10 @@ Tener activado en opciones -> almacenamiento -> carga rapida = NO
 
 Descargar usb2ps2.uf2 from https://github.com/destroyer-dcf/usb2ps2/releases/tag/1.2
 
-|![hw1](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/cassette.jpg) |
+|![hw1](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/cassette.jpg) |![hw2](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/cassette2.jpg) |
+|-|-|
+|![hw1](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/cassette3.jpg) |![hw2](https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/cassette4.jpg) |
+
 
 ## Version 1.1 (Keyboard and Mouse Support) (30/11/2024)
 
