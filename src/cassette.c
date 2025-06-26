@@ -11,8 +11,8 @@
 #define CASSETTE_STOP 8
 #define CASSETTE_PAUSE 2
 
-#define SCANCODE_REC 0x0c
-#define SCANCODE_PLAY 0x0b
+#define SCANCODE_REC 0x83
+#define SCANCODE_PLAY 0x3f
 #define SCANCODE_REW 0x83
 #define SCANCODE_FF 0x83
 #define SCANCODE_STOP 0x03
@@ -98,78 +98,99 @@ void Pause() {
 void cassetteControl()
 {
     readCassetteButton(&cassette_state);
-
+    
     // ##### REC BUTTON #####
     if (cassette_state.rec == 0 && cassette_state.last_rec == 1) {
-        sendCassetteButton(SCANCODE_REC, true);
+        kb_send_key_scs2(HID_KEY_F7, true, false);
     } else if (cassette_state.rec == 1 && cassette_state.last_rec == 1) {
-        sendCassetteButton(SCANCODE_REC, false);
+        kb_send_key_scs2(HID_KEY_F7, false, false);
         cassette_state.last_rec = 0;
     }
 
     if (cassette_state.rec == 0 && cassette_state.last_rec == 0) {
-        sendCassetteButton(SCANCODE_REC, true);
+        kb_send_key_scs2(HID_KEY_F7, true, false);
         cassette_state.last_rec = 1;
     }
 
     // ##### PLAY BUTTON #####
     if (cassette_state.play == 0 && cassette_state.last_play== 1) {
-        sendCassetteButton(SCANCODE_PLAY, true);
+        kb_send_key_scs2(HID_KEY_F5, true, false);
     } else if (cassette_state.play == 1 && cassette_state.last_play == 1) {
-        sendCassetteButton(SCANCODE_PLAY, false);
+        kb_send_key_scs2(HID_KEY_F5, false, false);
         cassette_state.last_play = 0;
     }
 
     if (cassette_state.play == 0 && cassette_state.last_play == 0) {
-        sendCassetteButton(SCANCODE_PLAY, true);
+        kb_send_key_scs2(HID_KEY_F5, true, false);
         cassette_state.last_play = 1;
     }
 
     // ##### REW BUTTON #####
     if (cassette_state.rew == 0 && cassette_state.last_rew== 1) {
-        sendCassetteButton(SCANCODE_REW, true);
+        kb_send_key_scs2(HID_KEY_SHIFT_LEFT, true, false);
+        kb_send_key_scs2(HID_KEY_F4, true, false);      
     } else if (cassette_state.rew == 1 && cassette_state.last_rew == 1) {
-        sendCassetteButton(SCANCODE_REW, false);
+        kb_send_key_scs2(HID_KEY_F4, false, false);      
+        kb_send_key_scs2(HID_KEY_SHIFT_LEFT, false, false); 
         cassette_state.last_rew = 0;
     }
 
     if (cassette_state.rew == 0 && cassette_state.last_rew == 0) {
-        sendCassetteButton(SCANCODE_REW, true);
+        kb_send_key_scs2(HID_KEY_SHIFT_LEFT, true, false); 
+        kb_send_key_scs2(HID_KEY_F4, true, false);        
         cassette_state.last_rew = 1;
     }
 
     // ##### FF BUTTON #####
     if (cassette_state.ff == 0 && cassette_state.last_ff== 1) {
-        sendCassetteButton(SCANCODE_FF, true);
+        kb_send_key_scs2(HID_KEY_SHIFT_LEFT, true, false); 
+        kb_send_key_scs2(HID_KEY_F4, true, false);        
     } else if (cassette_state.ff == 1 && cassette_state.last_ff == 1) {
-        sendCassetteButton(SCANCODE_FF, false);
+        kb_send_key_scs2(HID_KEY_F4, false, false);        
+        kb_send_key_scs2(HID_KEY_SHIFT_LEFT, false, false); 
         cassette_state.last_ff = 0;
     }
 
     if (cassette_state.ff == 0 && cassette_state.last_ff == 0) {
-        sendCassetteButton(SCANCODE_FF, true);
+        kb_send_key_scs2(HID_KEY_SHIFT_LEFT, true, false); // Presionar Shift
+        kb_send_key_scs2(HID_KEY_F4, true, false);         // Presionar F4
         cassette_state.last_ff = 1;
     }
 
     // ##### STOP BUTTON #####
     if (cassette_state.stop == 0 && cassette_state.last_stop == 1) {
         // Flanco de bajada: se acaba de pulsar
-        sendCassetteButton(SCANCODE_STOP, true);
+        kb_send_key_scs2(HID_KEY_F4, true, false);
     }
     else if (cassette_state.stop == 1 && cassette_state.last_stop == 0) {
         // Flanco de subida: se acaba de soltar
-        sendCassetteButton(SCANCODE_STOP, false);
+        kb_send_key_scs2(HID_KEY_F4, false, false);
     }
 
     // Actualiza el estado anterior
     cassette_state.last_stop = cassette_state.stop;
 
     // ##### PAUSE BUTTON #####
-    static uint32_t last_pause_time = 0;
-    uint32_t now = time_us_32();
-
-    if (cassette_state.pause == 0 && (now - last_pause_time > 200000)) { 
-        Pause();
-        last_pause_time = now;
+    if (cassette_state.pause == 0 && cassette_state.last_pause== 1) {
+        kb_send_key_scs2(HID_KEY_F5, true, false);   
+    } else if (cassette_state.pause== 1 && cassette_state.last_pause == 1) {
+        kb_send_key_scs2(HID_KEY_F5, false, false);       
+        cassette_state.last_pause = 0;
     }
+
+    if (cassette_state.pause == 0 && cassette_state.last_pause == 0) {
+        kb_send_key_scs2(HID_KEY_F5, true, false);
+        cassette_state.last_pause = 1;
+    }
+    // // Actualiza el estado anterior
+    // cassette_state.last_stop = cassette_state.stop;
+
+    // // ##### PAUSE BUTTON #####
+    // static uint32_t last_pause_time = 0;
+    // uint32_t now = time_us_32();
+
+    // if (cassette_state.pause == 0 && (now - last_pause_time > 200000)) { 
+    //     Pause();
+    //     last_pause_time = now;
+    // }
 }

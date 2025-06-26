@@ -9,15 +9,16 @@ Se implementa botones de cassete para Emulador ESPectrum.
 
 | PIN | BUTTON| 
 |----------|----------|
-| 28    | REC  | Snapshot emulador (F4)  |
-| 27   | PLAY   | PLAY  (F6) |
-| 26   | REW   | Abre TAPE Browser (F7)|
-| 9    | FF| Abre TAPE Browser (F7)|
-| 8    | EJECT| Selecciona TAP File (F5)   |
-| 2    | PAUSE| Pausa emulador   |
+| 28    | REC  | Snapshot emulador (F7)  |
+| 27   | PLAY   | PLAY  (F5) |
+| 26   | REW   | Abre TAPE Browser (SHIFT+F4)|
+| 9    | FF| Abre TAPE Browser (SHIFT+F4)|
+| 8    | EJECT| Selecciona TAP File (F4)   |
+| 2    | PAUSE| Pause carga (F5)   |
 
 ### Requisitos:
 
+Version minima del Emulador: ESPectrum.1.4.pr6.12
 Tener activado en opciones -> almacenamiento -> carga rapida = NO
 
 ### Como Utilizar Cassette
