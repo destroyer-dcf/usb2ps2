@@ -4,6 +4,7 @@
 <p align="center">
   <img src="https://raw.githubusercontent.com/destroyer-dcf/usb2ps2/main/images/usb2ps2.png" alt="hw2"/>
 </p>
+
 La placa **Usb2Ps2** esta diseñada para dar soporte a teclados y Ratones USB en el emulador **[ESPectrum](https://github.com/EremusOne/ESPectrum)** creado por **[Eremus](https://github.com/EremusOne)**. Convirtiendo estos perifericos a PS/2. El firmware original esta creado por **[NoOne](https://github.com/No0ne/ps2x2pico)** para placas de desarrollo Raspberry Pico, lo he adaptado para la **RP2040 Zero**.
 
 | Rev | Soporte| Manual |
